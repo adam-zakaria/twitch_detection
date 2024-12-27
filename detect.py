@@ -1,7 +1,8 @@
 import cv2
 
 # Load the template image
-template = cv2.imread('image.png', cv2.IMREAD_COLOR)
+# template = cv2.imread('image.png', cv2.IMREAD_COLOR)
+template = cv2.imread('medal_bg_removed.png', cv2.IMREAD_COLOR)
 template_height, template_width = template.shape[:2]
 
 # Open the video file
@@ -39,7 +40,7 @@ while True:
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
     
     # Define a threshold for detection
-    threshold = 0.8  # Adjust this value as needed
+    threshold = 0.55  # Adjust this value as needed
     
     # Check if the best match exceeds the threshold
     if max_val >= threshold:
