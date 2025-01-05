@@ -13,6 +13,7 @@ Creating embeddings (like text embeddings and semantic search) is an interesting
 ## `tesseract.py`
 * With a 3 second sample clip which was difficult (white on yellow background) (dk on bazaar), a few frames detected at least  'dou'. Very promising! 
 * Next we want to test this against the whole video and see if it gets all of them.
+* working on extract.py
 
 # Test video (clip)(zsh escaped) 'Lucid - Greatest Hits / Best Clips | Halo Infinite LAN':
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:25-00:26"
@@ -26,3 +27,6 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
     * Interested in applying a color match
     * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
     * So let's try tesseract on the whole duration. Let's get even more than we need.
+
+# Current work item
+extract.py extract clips from detectios
