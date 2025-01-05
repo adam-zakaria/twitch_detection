@@ -11,7 +11,7 @@ import cv2; import utils.utils as utils; import os
 
 utils.rm('compare_medals/frames_roi'); utils.mkdir('compare_medals/frames_roi');utils.rm('compare_medals/frames_full'); utils.mkdir('compare_medals/frames_full'); utils.rm('compare_medals/frames_text'); utils.mkdir('compare_medals/frames_text');
 
-for i,frame in enumerate(utils.get_frames('1s_dk.mp4')): 
+for i,frame,frame_rate in enumerate(utils.get_frames('1s_dk.mp4')): 
   print(i)
   if i % 10 == 0: 
     # write different kinds of frames, frame[y0:y1,x0:x1]

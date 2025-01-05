@@ -1,5 +1,5 @@
 # Experiments
-`py compare_medal_cv.py`
+## `compare_medal_cv.py`
 Shows that the dk medal has slight transparency.
 
 This tempts me to try a few approaches. All can likely benefit from preprocessing.
@@ -9,6 +9,10 @@ This tempts me to try a few approaches. All can likely benefit from preprocessin
 * Circle + stars general shape detection should be possible but unsure how - maybe return to template matching. Maybe template matching + ROI.
 
 Creating embeddings (like text embeddings and semantic search) is an interesting idea but this seems like a large dataset kind of approach.
+
+## `tesseract.py`
+* With a 3 second sample clip which was difficult (white on yellow background) (dk on bazaar), a few frames detected at least  'dou'. Very promising! 
+* Next we want to test this against the whole video and see if it gets all of them.
 
 # Test video (clip)(zsh escaped) 'Lucid - Greatest Hits / Best Clips | Halo Infinite LAN':
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:25-00:26"
