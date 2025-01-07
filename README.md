@@ -29,4 +29,7 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
     * So let's try tesseract on the whole duration. Let's get even more than we need.
 
 # Current work item
-extract.py extract clips from detectios
+* Extract is working, we need to concat into a single file. mp4. 
+
+
+

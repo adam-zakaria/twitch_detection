@@ -29,6 +29,7 @@ def watch_file(script_to_run):
     observer.join()
 
 if __name__ == "__main__":
-    script_to_run = 'detect_and_extract.py'
-    watch_file(script_to_run)
+  if len(sys.argv) < 2:
+    print('usage: watchman.py <file_to_watch>')
+  watch_file(sys.argv[1])
 

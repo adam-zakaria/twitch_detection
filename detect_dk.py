@@ -1,9 +1,9 @@
 """
+Run tesseract on 3s_dk.mp4 to detect dk
+
 get frames 3s_dk.mp4 + use_roi
 for frame, get tesseract output (called {frame_i}.txt)
 read in all files, print any that are not empty
-
-yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:24-00:27"
 
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:00-04:00"
 """
@@ -23,27 +23,3 @@ for i,(frame,frame_rate) in enumerate(utils.get_frames('4m_dk.mp4')):
   if 'Dou' in utils.r(file): # case sensitive
     print('******************'); print(f'detection at: {time_in_seconds}'); print('******************')
     utils.wa(str(f'{time_in_seconds}\n'), 'dk_detections.txt')
-
-"""
-:25
-:33
-:42
-:50
-1:24
-2;03
-2;47
-254
-310
-"""
-"""
-for file in utils.ls('tesseract_output'):
-  frame_num = int(utils.get_file_basename(file))
-  time_in_seconds = frame_num / frame_rate
-  print(frame_num)
-  if 'dou' in utils.r(file):
-    print(utils.r(file))
-    print(time_in_seconds)
-    print('******************')
-    utils.wa(time_in_seconds, 'dk_detections.txt')
-"""
-
