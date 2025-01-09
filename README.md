@@ -27,9 +27,3 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
     * Interested in applying a color match
     * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
     * So let's try tesseract on the whole duration. Let's get even more than we need.
-
-# Current work item
-* Extract is working, we need to concat into a single file. mp4. 
-
-
-
