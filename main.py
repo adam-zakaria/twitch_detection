@@ -1,47 +1,20 @@
 import subprocess; import uuid; import sys; import cv2; import os; import glob; import utils.utils as utils; from itertools import pairwise; from datetime import datetime, timedelta; import time
 
 def download_twitch_streams_time_range(start_time, end_time, streamers, output_path):
-    """
-    Checks Twitch streamers' live status within a time range and downloads their streams if they are live.
-    """
-    print("Starting Twitch stream download within time range.")
-
-    now = datetime.now()
-    start_dt = datetime.combine(now.date(), datetime.strptime(start_time, "%H:%M").time())
-    end_dt = datetime.combine(now.date(), datetime.strptime(end_time, "%H:%M").time())
-
-    if end_dt <= start_dt:
-        end_dt += timedelta(days=1)
-
-    downloaded_streams = []
+    print("Starting Twitch stream download within time range."); now = datetime.now(); start_dt = datetime.combine(now.date(), datetime.strptime(start_time, "%H:%M").time()); end_dt = datetime.combine(now.date(), datetime.strptime(end_time, "%H:%M").time()); end_dt += timedelta(days=1) if end_dt <= start_dt else timedelta(0); downloaded_streams = []
 
     while datetime.now() < end_dt:
         current_time = datetime.now()
         if current_time >= start_dt:
             print(f"In the time range ({current_time.strftime('%H:%M:%S')} EST). Checking streams...")
-            processes = []
             for streamer in streamers:
-                result = subprocess.run(['yt-dlp', '--get-url', '-S', 'vcodec:h265,acodec:aac', f'https://www.twitch.tv/{streamer}', '-o', f'{output_path}/stream.%(ext)s'], text=True, capture_output=True)
-                if "The channel is not currently live" in result.stderr:
-                    print(f"{streamer} is not currently live.")
-                else:
-                    utils.mkdir(output_path)
-                    print(f"Downloading {streamer} to {output_path}...")
-                    process = subprocess.Popen(['yt-dlp', '-S', 'vcodec:h265,acodec:aac', f'https://www.twitch.tv/{streamer}', '-o', f'{output_path}/{streamer}/{uuid.uuid4().hex}.%(ext)s'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    processes.append(process)
-
-            for process in processes:
-                process.wait()
-
-            downloaded_streams.extend(glob.glob(f'{output_path}/**/*.mp4'))
-            print("Checked streams. Next check in 10 minutes.")
+                utils.mkdir(output_path); streamer_output_path = os.path.join(output_path, streamer); os.makedirs(streamer_output_path, exist_ok=True); print(f"Waiting for and downloading {streamer}'s stream to {streamer_output_path}...")
+                subprocess.Popen(['yt-dlp', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac', f'https://www.twitch.tv/{streamer}', '-o', f'{streamer_output_path}/{uuid.uuid4().hex}.%(ext)s'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print("Checked all streams. Next check will occur automatically as streams come online.")
         else:
-            print(f"Out of time range ({current_time.strftime('%H:%M:%S')} EST). Sleeping...")
+            print(f"Out of time range ({current_time.strftime('%H:%M:%S')} EST). Sleeping until start time..."); sleep_duration = (start_dt - current_time).total_seconds(); time.sleep(max(sleep_duration, 0))
 
-        time.sleep(10 * 60)
-
-    print(f"Time range ended. Downloads completed. Streams saved in {output_path}.")
-    return downloaded_streams
+    print(f"Time range ended. Downloads completed. Streams saved in {output_path}."); return downloaded_streams
 
 def download_twitch_streams(streamers, output_path):
     """

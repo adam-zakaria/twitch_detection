@@ -28,10 +28,7 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
     * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
     * So let's try tesseract on the whole duration. Let's get even more than we need.
 # Current
-* time_range is working: tested in time range, out of time range. there are a lot of ways it can be messed up though. It's hard to come up with a test case. we want a detection...maybe between 5-6AM we run the rest? i.e. 
-python main.py detect && python main.py filter_and_extract && python main.py concat
-I'm at least partially suspicious of this time based approach..let's try it. And we'll do small test cases. i.e. we can do it for an hour. we can also do it 1 minute to evaluate what happens (i.e. confirm good prints happen)
-download 08:00-04:00 
-detect, extract, concat, post, 4:01
+Need to implement returning to the (in download range) the main loop once stream downloading has started. for instance, once we do our initial check and start downloading, we need to return to the main loop and sleep for 10 minutes then check again. however, we need to insure that if the streamer is streaming h
 
-So maybe this needs a main loop which decides what to do depending on what it is?
+does the download archive work? 
+also, if a streamer goes offline, what happen
