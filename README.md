@@ -27,8 +27,6 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
     * Interested in applying a color match
     * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
     * So let's try tesseract on the whole duration. Let's get even more than we need.
-# Current
-Need to implement returning to the (in download range) the main loop once stream downloading has started. for instance, once we do our initial check and start downloading, we need to return to the main loop and sleep for 10 minutes then check again. however, we need to insure that if the streamer is streaming h
 
-does the download archive work? 
-also, if a streamer goes offline, what happen
+# Current
+* get better logging for --wait-for-streams
