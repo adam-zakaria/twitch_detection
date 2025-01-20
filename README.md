@@ -29,4 +29,8 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
     * So let's try tesseract on the whole duration. Let's get even more than we need.
 
 # Current
-* get better logging for --wait-for-streams
+* Get .ssh/config, .aws onto linux
+* Run the full thing on aws gpu, see what happens. Also, could do detections on gpu but download on non gpu.
+* Also, this is only double kills, so we'd want to do more. Also let's find a way to be excited about this instead of feeling very drained by it. Let's do a diagram!
+
+

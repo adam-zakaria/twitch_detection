@@ -1,4 +1,4 @@
-import subprocess; import uuid; import sys; import cv2; import os; import glob; import utils.utils as utils; from itertools import pairwise; from datetime import datetime, time
+import subprocess; import uuid; import sys; import cv2; import os; import glob; import utils.utils as utils; from itertools import pairwise; from datetime import datetime, time; from time import sleep
 
 def download_twitch_streams(streamers, output_path):
     print("Starting Twitch stream downloads"); downloaded_streams = []
@@ -74,18 +74,23 @@ if __name__ == "__main__":
         print('Usage: python main.py <download_twitch_streams | detect | filter | concat>')
         sys.exit()
 
-    streamers = ['Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG']
+    streamers = ['Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound']
     streams_output_path = 'twitch_streams'
 
     if len(sys.argv) == 1:
         download_twitch_streams(streamers, "./twitch_streams_time_range")
         #if it's 6AM process twitch streams for double kills
         processed_this_time_range = False
-        while((time(0,0,0) <= datetime.now().time() <= time(22,0,0)) and (processed_this_time_range == False)):
-          detect(glob.glob(f'{streams_output_path}/**/*.mp4'))
-          extract('detections', 'clips')
-          concat('clips')
-          processed_this_time_range == True
+        # HH, MM, SS
+        while True:
+          if (time(6,0,0) <= datetime.now().time() <= time(8,0,0)) and (processed_this_time_range == False):
+            detect(glob.glob(f'{streams_output_path}/**/*.mp4'))
+            extract('detections', 'clips')
+            concat('clips')
+            processed_this_time_range == True
+          else:
+            print(f'It is {datetime.now().time()}, will process streams around 6AM\nSleeping for 1 minute.')
+            sleep(60) # check time every minute
         processed_this_time_range == False
         
           
