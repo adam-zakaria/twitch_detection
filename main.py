@@ -1,4 +1,16 @@
-import subprocess; import uuid; import sys; import cv2; import os; import glob; import utils.utils as utils; from itertools import pairwise; from datetime import datetime, time; from time import sleep
+import subprocess; import uuid; import sys; import cv2; import os; import glob; import utils.utils as utils; from itertools import pairwise; from datetime import timedelta
+
+# CURRENTLY BROKEN! :D
+def total_video_time():
+    # sums twitch_streams_time_range/{streamer}/*.mp4 (not .mp4.part)
+    folder_path = "twitch_streams_time_range"
+    total_seconds = sum(
+        float(subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", os.path.join(root, file)],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        ).stdout.strip() or 0)
+        for root, _, files in os.walk(folder_path) for file in files)
+    print(f"Total Duration: {str(timedelta(seconds=int(total_seconds)))}")
 
 def download_twitch_streams(streamers, output_path):
     print("Starting Twitch stream downloads"); downloaded_streams = []
@@ -83,14 +95,14 @@ if __name__ == "__main__":
         processed_this_time_range = False
         # HH, MM, SS
         while True:
-          if (time(6,0,0) <= datetime.now().time() <= time(8,0,0)) and (processed_this_time_range == False):
+          if (utils.time(6,0,0) <= utils.now() <= utils.time(8,0,0)) and (processed_this_time_range == False):
             detect(glob.glob(f'{streams_output_path}/**/*.mp4'))
             extract('detections', 'clips')
             concat('clips')
             processed_this_time_range == True
           else:
-            print(f'It is {datetime.now().time()}, will process streams around 6AM\nSleeping for 1 minute.')
-            sleep(60) # check time every minute
+              print(f'It is {utils.now()}, will process streams around {utils.time(6,0,0)}\nSleeping for 1 minute.\nTotal video time:{total_video_time()}')
+              utils.sleep(60) # check time every minute
         processed_this_time_range == False
         
           
