@@ -24,9 +24,7 @@ def detect(model, input_dir, output_dir):
   print(f"Detection process completed. Results saved in {detections_file}.")
 
 if __name__ == "__main__":
-  if len(sys.argv) != 5: print("Usage: python main.py detect <model_name> <input_dir> <output_dir>"); sys.exit(1)
-  command, model_name, input_dir, output_dir = sys.argv[1:]
-  if command == "detect":
-    if model_name not in ["tesseract", "paddleocr"]: print("Error: Model must be 'tesseract' or 'paddleocr'"); sys.exit(1)
-    detect(model_name, input_dir, output_dir)
-  else: print(f"Unsupported command: {command}"); sys.exit(1)
+  if len(sys.argv) != 4: print("Usage: python detect.py  <model_name> <input_dir> <output_dir>"); sys.exit(1)
+  model_name, input_dir, output_dir = sys.argv[1:]
+  if model_name not in ["tesseract", "paddleocr"]: print("Error: Model must be 'tesseract' or 'paddleocr'"); sys.exit(1)
+  detect(model_name, input_dir, output_dir)
