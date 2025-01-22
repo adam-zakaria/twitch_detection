@@ -13,7 +13,8 @@ def detect(model, input_dir, output_dir):
   [utils.rm(d) for d in [frames_dir, ocr_output_dir, detections_file]]; [utils.mkdir(d) for d in [frames_dir, ocr_output_dir]]
   
   # Initialize the OCR model based on the provided model name
-  ocr_model = PaddleOCR(use_gpu=True) if model == "paddleocr" else None
+  #ocr_model = PaddleOCR(use_gpu=True) if model == "paddleocr" else None
+  ocr_model = PaddleOCR(use_gpu=False) if model == "paddleocr" else None
 
   # Iterate over all .mp4 video files in the input directory (recursively)
   for video_path in glob.glob(f"{input_dir}/**/*.mp4", recursive=True):

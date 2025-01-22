@@ -19,8 +19,19 @@ Creating embeddings (like text embeddings and semantic search) is an interesting
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:25-00:26"
 
 # OCR
-* Couldn't get paddle to work on mac m2
-* tesseract works out of the box
+## Paddle
+* Does not work out of the box
+* https://github.com/PaddlePaddle/PaddleOCR/discussions/13060?converting=1
+* Did the following and it works
+```
+python3 -m venv env
+source ./env/bin/activate
+python3 -m pip install "paddleocr>=2.6rc"
+pip3 install paddlepaddle==0.0.0 -f https://www.paddlepaddle.org.cn/whl/mac/cpu/develop.html
+```
+
+
+## Tesseract works out of the box
     * brew install tesseract
     * tesseract /Users/azakaria/Code/halo_dk_detection/sample.png sample_ocr # outputs to sample_orc.txt, with the detection (successful)
     * dk detection did not work
@@ -32,5 +43,3 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
 * Get .ssh/config, .aws onto linux
 * Run the full thing on aws gpu, see what happens. Also, could do detections on gpu but download on non gpu.
 * Also, this is only double kills, so we'd want to do more. Also let's find a way to be excited about this instead of feeling very drained by it. Let's do a diagram!
-
-
