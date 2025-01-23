@@ -1,3 +1,5 @@
+
+
 # Experiments
 ## `compare_medal_cv.py`
 Shows that the dk medal has slight transparency.
@@ -29,7 +31,7 @@ source ./env/bin/activate
 python3 -m pip install "paddleocr>=2.6rc"
 pip3 install paddlepaddle==0.0.0 -f https://www.paddlepaddle.org.cn/whl/mac/cpu/develop.html
 ```
-
+Always source the activate before using the model.
 
 ## Tesseract works out of the box
     * brew install tesseract
