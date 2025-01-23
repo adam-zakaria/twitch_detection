@@ -1,3 +1,43 @@
+# OCR
+## Paddle
+* Does not work out of the box on MacOS m2 or Ubuntu (our GPU AMI)
+
+
+
+## Ubuntu (AWS)
+Paddle's latest supported CUDA is 12.3, as detailed from the link below. We used ChatGPT to install 12.3: 
+`sudo apt-get install -y cuda-toolkit-12-3`
+I'm not sure we need the NVIDIA driver, but we might (specifically, the legacy one, needed by g4dnxl's T4 GPU)
+`sudo apt-get install -y cuda-drivers`
+From:
+https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_network
+
+Then we can install paddle:
+```
+python3 -m pip install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/ paddleocr
+```
+From:
+https://www.paddlepaddle.org.cn/documentation/docs/en/install/pip/linux-pip_en.html#span-id-gpu-gpu-version-of-paddlepaddle-span
+
+## MacOS M2
+* https://github.com/PaddlePaddle/PaddleOCR/discussions/13060?converting=1
+Instructions from above are below:
+```
+python3 -m venv env
+source ./env/bin/activate
+python3 -m pip install "paddleocr>=2.6rc"
+pip3 install paddlepaddle==0.0.0 -f https://www.paddlepaddle.org.cn/whl/mac/cpu/develop.html
+```
+Always source the activate before using the model.
+
+## Tesseract works out of the box
+    * brew install tesseract
+    * tesseract /Users/azakaria/Code/halo_dk_detection/sample.png sample_ocr # outputs to sample_orc.txt, with the detection (successful)
+    * dk detection did not work
+    * Interested in applying a color match
+    * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
+    * So let's try tesseract on the whole duration. Let's get even more than we need.
+
 
 
 # Experiments
@@ -19,27 +59,6 @@ Creating embeddings (like text embeddings and semantic search) is an interesting
 
 # Test video (clip)(zsh escaped) 'Lucid - Greatest Hits / Best Clips | Halo Infinite LAN':
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:25-00:26"
-
-# OCR
-## Paddle
-* Does not work out of the box
-* https://github.com/PaddlePaddle/PaddleOCR/discussions/13060?converting=1
-* Did the following and it works
-```
-python3 -m venv env
-source ./env/bin/activate
-python3 -m pip install "paddleocr>=2.6rc"
-pip3 install paddlepaddle==0.0.0 -f https://www.paddlepaddle.org.cn/whl/mac/cpu/develop.html
-```
-Always source the activate before using the model.
-
-## Tesseract works out of the box
-    * brew install tesseract
-    * tesseract /Users/azakaria/Code/halo_dk_detection/sample.png sample_ocr # outputs to sample_orc.txt, with the detection (successful)
-    * dk detection did not work
-    * Interested in applying a color match
-    * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
-    * So let's try tesseract on the whole duration. Let's get even more than we need.
 
 # Current
 * Get .ssh/config, .aws onto linux
