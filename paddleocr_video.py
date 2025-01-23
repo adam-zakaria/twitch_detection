@@ -1,4 +1,4 @@
-from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise;  # Importing the generator for video frames
+from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess
 
 # Initialize the PaddleOCR model; uses English language and angle classification
 ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False, use_gpu=True)  # Load OCR model once during initialization
@@ -74,6 +74,26 @@ def extract(input_video_path, output_video_folder, detections: float):
 
     print(f"Clips saved in {output_video_folder}.")
 
+def concat(input_clips_path, output_folder):
+    """
+    Concatenates multiple video clips into a single video.
+    """
+    utils.rm_mkdir(output_folder)
+
+    print("Starting clip concatenation.")
+    for clip_path in utils.ls(input_clips_path):
+        print(f"Adding {clip_path} to concatenation list.")
+        utils.wa(f"file '../{clip_path}'\n", 'concat/concat_files.txt') # path to clip must be relative to path of concat_files.txt
+
+    output_folder = 'concat'
+    subprocess.run(
+        ['ffmpeg', '-f', 'concat', '-safe', '0', '-i', 'concat/concat_files.txt', '-c', 'copy', f'{output_folder}/output.mp4'],
+        check=True
+    )
+    print(f"Concatenated video saved in {output_folder}/output.mp4.")
+    return output_folder
+
+
 # Main entry point of the script
 if __name__ == "__main__":
   # Process a sample video and save results to the specified output directory
@@ -81,3 +101,4 @@ if __name__ == "__main__":
   detections = filter('/Users/azakaria/Code/twitch_detections/paddleocr_output/dk_detections_original.txt')
   print(detections)
   extract('/Users/azakaria/Code/twitch_detections/test/videos/4m_dk.mp4','extract', detections)
+  concat('extract', 'concat')
