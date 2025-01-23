@@ -1,8 +1,8 @@
 # OCR
 ## Paddle
 * Does not work out of the box on MacOS m2 or Ubuntu (our GPU AMI)
-
-
+* There are different packages for the CPU and GPU builds:
+https://www.paddlepaddle.org.cn/documentation/docs/en/install/pip/linux-pip_en.html#installation
 
 ## Ubuntu (AWS)
 Paddle's latest supported CUDA is 12.3, as detailed from the link below. We used ChatGPT to install 12.3: 
