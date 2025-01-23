@@ -1,4 +1,6 @@
-
+# Install local dependencies
+pip install -e /Users/azakaria/Code/utils
+pip install -e ~/Code/cliptu/backend/cliptu/
 
 # Experiments
 ## `compare_medal_cv.py`

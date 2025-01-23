@@ -58,29 +58,23 @@ def filter(detections_path):
     else:
        return mk_ss
     
-def extract(detections_path, clips_output_path):
+import cliptu.clip as clip
+def extract(input_video_path, output_video_folder, detections: float):
     """
     Extracts video clips based on detection times.
     """
-    print("Starting clip extraction.")
-    mk_ss = [a for a, b in pairwise(map(float, utils.rl('dk_detections.txt'))) if (b - a) > 3]
+    utils.rm_mkdir(output_video_folder)
 
-    if not mk_ss:
-        print("No detections found. Skipping clip extraction.")
-        return
+    for detection in detections:
+        print(f"Extracting clip around {detection}s...")
+        clip.extract_clip(input_video_path, f'{output_video_folder}/{detection}.mp4', detection-8, detection+1)
 
-    import cliptu.clip as clip
-    utils.rm_mkdir(clips_output_path)
-
-    for s in mk_ss:
-        print(f"Extracting clip around {s}s...")
-        clip.extract_clip(stream_path, f'{clips_output_path}/{s}.mp4', s-8, s+1)
-
-    print(f"Clips saved in {clips_output_path}.")
+    print(f"Clips saved in {output_video_folder}.")
 
 # Main entry point of the script
 if __name__ == "__main__":
   # Process a sample video and save results to the specified output directory
   #detect_paddleocr('test/videos/1s_dk.mp4', 'test/ocr_results')
-  fr = filter('/Users/azakaria/Code/twitch_detections/paddleocr_output/dk_detections_original.txt')
-  print(fr)
+  detections = filter('/Users/azakaria/Code/twitch_detections/paddleocr_output/dk_detections_original.txt')
+  print(detections)
+  extract('/Users/azakaria/Code/twitch_detections/test/videos/4m_dk.mp4','extract', detections)
