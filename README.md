@@ -66,6 +66,8 @@ Creating embeddings (like text embeddings and semantic search) is an interesting
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:25-00:26"
 
 # Current
-* Get .ssh/config, .aws onto linux
-* Run the full thing on aws gpu, see what happens. Also, could do detections on gpu but download on non gpu.
-* Also, this is only double kills, so we'd want to do more. Also let's find a way to be excited about this instead of feeling very drained by it. Let's do a diagram!
+* the clips are extracted properly, but the concat is not working.
+
+# todo
+* optimize speed - talk to gpt, can do a lot. skip frames, batch images, etc.
+* on front upload twitch streams to s3, on front spawn gpu, on gpu download streams from s3 and upload concat.mp4

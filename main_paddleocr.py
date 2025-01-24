@@ -1,7 +1,5 @@
 from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess; import cliptu.clip as clip
 
-#[concat @ 0x60926e399700] Impossible to open 'output/concat/../extract/output/extract/0_02.mp4' output/concat/concat_files.txt: No such file or directory
-
 # Initialize the PaddleOCR model; uses English language and angle classification
 ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False, use_gpu=True)  # Load OCR model once during initialization
 
@@ -11,6 +9,7 @@ def detect(input_video_path, output_detections_path):
 
   with open(output_detections_path, 'w') as f:
     for frame_index, (frame, fps) in enumerate(utils.get_frames(input_video_path), start=1):
+      if frame_index % 4 != 0: continue # process every 4th frame
       frame = frame[441:441+131, 529:529+266]  # get ROI
       result = ocr.ocr(frame, cls=True)  # Extract text and bounding boxes from the frame
       result = result[0]
@@ -57,22 +56,46 @@ def concat(input_clips_path, output_folder):
   utils.rm_mkdir(output_folder)  # Ensure the output directory exists
 
   print("Starting clip concatenation.")
-  for clip_path in utils.ls(input_clips_path):
+  for clip_path in sorted(utils.ls(input_clips_path)):
     clip_path = os.path.basename(clip_path)
     print(f"Adding {clip_path} to concatenation list.")
     utils.wa(f"file '../extract/{clip_path}'\n", f'{output_folder}/concat_files.txt')  # path to clip must be relative to path of concat_files.txt
 
+  """
   subprocess.run(
     ['ffmpeg', '-f', 'concat', '-safe', '0', '-i', f'{output_folder}/concat_files.txt', '-c', 'copy', f'{output_folder}/output.mp4'],
     check=True
   )
+  """
+
+  concat_command = f"ffmpeg -y -hide_banner -loglevel error -f f'{output_folder}/concat_files.txt' concat -safe 0 -i  -c copy f'{output_folder}/output.mp4'"
+  subprocess.run(
+    [
+      "ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "concat", 
+      "-safe", "0", "-i", f"{output_folder}/concat_files.txt", 
+      "-c", "copy", f"{output_folder}/output.mp4"
+    ],
+    check=True  # Raises an error if the command fails
+  )
+
+  """
+  # Re-encode during concatenation with MP4 output
+  subprocess.run(
+    ['ffmpeg', '-f', 'concat', '-safe', '0', '-i', f'{output_folder}/concat_files.txt',
+     '-c:v', 'libx264', '-preset', 'fast', '-crf', '18',  # High-quality encoding
+     '-c:a', 'aac', '-b:a', '192k',  # High-quality AAC audio
+     f'{output_folder}/output.mp4'],
+    check=True
+  )
+  """
+
   print(f"Concatenated video saved in {output_folder}/output.mp4.")
   return output_folder
 
 if __name__ == "__main__":
   # All output files are saved in folders named after their function, i.e. detect, filter, etc.
-  input_video_path = 'test/videos/1s_dk.mp4'
-  detect(input_video_path, 'output/detect/dk_detections.txt')
-  filter('output/detect/dk_detections.txt', 'output/filter/dk_detections.txt')
-  extract(input_video_path, 'output/extract')
+  #input_video_path = 'test/videos/1m_dk.mp4'
+  #detect(input_video_path, 'output/detect/dk_detections.txt')
+  #filter('output/detect/dk_detections.txt', 'output/filter/dk_detections.txt')
+  #extract(input_video_path, 'output/extract')
   concat('output/extract', 'output/concat')
