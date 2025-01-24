@@ -1,8 +1,7 @@
-<<<<<<< HEAD
 # Install local dependencies
-pip install -e /Users/azakaria/Code/utils
+pip install -e ~/Code/utils
 pip install -e ~/Code/cliptu/backend/cliptu/
-=======
+
 # OCR
 ## Paddle
 * Does not work out of the box on MacOS m2 or Ubuntu (our GPU AMI)
@@ -36,15 +35,15 @@ pip3 install paddlepaddle==0.0.0 -f https://www.paddlepaddle.org.cn/whl/mac/cpu/
 Always source the activate before using the model.
 
 ## Tesseract works out of the box
-    * brew install tesseract
-    * tesseract /Users/azakaria/Code/halo_dk_detection/sample.png sample_ocr # outputs to sample_orc.txt, with the detection (successful)
-    * dk detection did not work
-    * Interested in applying a color match
-    * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
-    * So let's try tesseract on the whole duration. Let's get even more than we need.
+* brew install tesseract
+* tesseract /Users/azakaria/Code/halo_dk_detection/sample.png sample_ocr # outputs to sample_orc.txt, with the detection (successful)
+* dk detection did not work
+* Interested in applying a color match
+* The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
+* So let's try tesseract on the whole duration. Let's get even more than we need.
 
-
->>>>>>> 9c0605c12dfb478f28b08025b16a841db910c20a
+# Style Decisions
+We try to have explicit arguments for the pipeline functions to make them more reusable, testable, and modular. Inevitably, we will want to reuse, test or modify them elsewhere. It seems that explicit interfaces better enables this. This is worth explanation because inevitably I ask myself well if we know where everything will be written, why even have all this extra info and typing? Because code evolves and we reuse and modify it and that is a high priority. So yeah, we're not necessarily thinking of just this situation, but everything that is done in the life of the software.
 
 # Experiments
 ## `compare_medal_cv.py`
