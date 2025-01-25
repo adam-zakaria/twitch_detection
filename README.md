@@ -42,6 +42,23 @@ Always source the activate before using the model.
 * The white on the yellow white background is really hard to detect. However, I might've chosen bad frames, I want to try the duration of the medal and see if any detections are made.
 * So let's try tesseract on the whole duration. Let's get even more than we need.
 
+# Torch
+I'm a little confused because nvcc is reporting 12.6, but I thought we installed 12.3 from above.
+
+ubuntu@ip-172-31-75-23:~/Code/twitch_detection$ nvcc --version
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2024 NVIDIA Corporation
+Built on Tue_Oct_29_23:50:19_PDT_2024
+Cuda compilation tools, release 12.6, V12.6.85
+
+Regardless, we installed libcudnn8 to do parallel frame processing with torch and it seems to be working.
+
+ubuntu@ip-172-31-75-23:~/Code/twitch_detection$ sudo apt install libcudnn8 libcudnn8-dev
+
+ubuntu@ip-172-31-75-23:~/Code/twitch_detection$ python -c "import torch; print(torch.cuda.is_available())"
+True
+
+
 # Style Decisions
 We try to have explicit arguments for the pipeline functions to make them more reusable, testable, and modular. Inevitably, we will want to reuse, test or modify them elsewhere. It seems that explicit interfaces better enables this. This is worth explanation because inevitably I ask myself well if we know where everything will be written, why even have all this extra info and typing? Because code evolves and we reuse and modify it and that is a high priority. So yeah, we're not necessarily thinking of just this situation, but everything that is done in the life of the software.
 
