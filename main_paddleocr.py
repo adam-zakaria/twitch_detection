@@ -1,26 +1,32 @@
 from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess; import cliptu.clip as clip
 
 # Initialize the PaddleOCR model; uses English language and angle classification
-ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False, use_gpu=True)  # Load OCR model once during initialization
+#ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False, use_gpu=True)  # Load OCR model once during initialization
+ocr = PaddleOCR(use_angle_cls=False, lang='en', show_log=False, use_gpu=True)  # Load OCR model once during initialization
+
+import logging
+logging.getLogger("ppocr").disabled = True
 
 # Function to process a video and extract OCR text from each frame
 def detect(input_video_path, output_detections_path):
   utils.rm_mkdir(os.path.dirname(output_detections_path))  # Ensure the output directory exists
 
+  print('detect')
   with open(output_detections_path, 'w') as f:
     for frame_index, (frame, fps) in enumerate(utils.get_frames(input_video_path), start=1):
       if frame_index % 4 != 0: continue # process every 4th frame
       frame = frame[441:441+131, 529:529+266]  # get ROI
       result = ocr.ocr(frame, cls=True)  # Extract text and bounding boxes from the frame
       result = result[0]
-      print(f"Frame {frame_index}")
-      if result is None: print('None result'); continue
+      #print(f"Frame {frame_index}")
+      #if result is None: print('None result'); continue
+      if result is None: continue
       for line in result:
         text = line[1][0]  # Extract the recognized text
         if 'Dou' in text:
-          print(f'****************************')
-          print(f"Match found: {text}")
-          print(f'****************************')
+          #print(f'****************************')
+          #print(f"Match found: {text}")
+          #print(f'****************************')
           detection_time = frame_index / fps  # Frame index divided by FPS gives the time in seconds
           utils.wa(f"{detection_time:.2f}\n", output_detections_path)  # Write the detection time to the file
 
@@ -94,8 +100,15 @@ def concat(input_clips_path, output_folder):
 
 if __name__ == "__main__":
   # All output files are saved in folders named after their function, i.e. detect, filter, etc.
-  #input_video_path = 'test/videos/1m_dk.mp4'
-  #detect(input_video_path, 'output/detect/dk_detections.txt')
-  #filter('output/detect/dk_detections.txt', 'output/filter/dk_detections.txt')
-  #extract(input_video_path, 'output/extract')
+
+  import time 
+
+  input_video_path = 'test/videos/1m_dk.mp4'
+  start_time = time.time()  # Record start time
+  detect(input_video_path, 'output/detect/dk_detections.txt')
+  filter('output/detect/dk_detections.txt', 'output/filter/dk_detections.txt')
+  extract(input_video_path, 'output/extract')
+  elapsed_time = time.time() - start_time  # Calculate elapsed time
+  print(f'Time to run: {elapsed_time}')
+
   concat('output/extract', 'output/concat')

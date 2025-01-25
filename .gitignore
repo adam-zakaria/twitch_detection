@@ -12,3 +12,4 @@ detect
 filter
 extract
 concat
+test_download_folder
