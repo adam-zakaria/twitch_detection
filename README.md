@@ -58,6 +58,9 @@ ubuntu@ip-172-31-75-23:~/Code/twitch_detection$ sudo apt install libcudnn8 libcu
 ubuntu@ip-172-31-75-23:~/Code/twitch_detection$ python -c "import torch; print(torch.cuda.is_available())"
 True
 
+# Preprocessing frame resize / Batch Processing
+We've discovered that the frame resize operation takes about the same time as the ocr inference, and were hoping we could easily preprocess resize all the frames. We learned that decoded images are way bigger than there encoded size in the video so even a minute video that's 40mb can be gigabytes when they are decoded / decompressed frames. So we tried to batch process the frames. We tried 100, it crashed the gpu. We tried 1 and learned the tensor operation seems to be very slow. I'd think the next step would be trying 50 frames and see if it's worth it, but it's possible our approach is also just off.
+
 
 # Style Decisions
 We try to have explicit arguments for the pipeline functions to make them more reusable, testable, and modular. Inevitably, we will want to reuse, test or modify them elsewhere. It seems that explicit interfaces better enables this. This is worth explanation because inevitably I ask myself well if we know where everything will be written, why even have all this extra info and typing? Because code evolves and we reuse and modify it and that is a high priority. So yeah, we're not necessarily thinking of just this situation, but everything that is done in the life of the software.
