@@ -8,3 +8,7 @@ detections
 tesseract_frames
 tesseract_output
 compare_medals
+detect
+filter
+extract
+concat
