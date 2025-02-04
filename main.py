@@ -87,17 +87,32 @@ def write_filtered_frames(input_video_path, filtered_detections_path):
   return
 
 if __name__ == "__main__":
-  # All output files are saved in folders named after their function, i.e. detect, filter, etc.
+  # All output files are saved in folders named after their function, i.e. detect, filter, etc. ##########
 
+  # INIT ##########
   #input_video_path = 'test/videos/1m_dk.mp4'
   input_video_path = '/home/ubuntu/Code/twitch_detection/twitch_streams/Bound/329ca4963e5a4bccbe1fae83f83d5549.mp4'
   roi = (529, 441, 266, 131)
   start_time = time.time()  # Record start time
+  # /INIT ##########
 
+  # PIPELINE ##########
   detect(input_video_path, roi, 'output/detect/dk_detections.txt')
   filter('output/detect/dk_detections.txt', 'output/filter/dk_detections.txt')
+  # /PIPELINE ##########
+
+  # LOGGING ##########
+  write_filtered_frames()
+  # /LOGGING ##########
+
+  # PIPELINE ##########
   extract(input_video_path, 'output/extract')
+  concat('output/extract', 'output/concat')
+  # /PIPELINE ##########
+
+  # FINISH BENCHMARKING ############
   elapsed_time = time.time() - start_time  # Calculate elapsed time
   print(f'Time to run: {elapsed_time}')
+  # /FINISH BENCHMARKING ############
 
-  concat('output/extract', 'output/concat')
+
