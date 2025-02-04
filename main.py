@@ -83,11 +83,13 @@ def concat(input_clips_path, output_folder):
 def write_filtered_frames(input_video_path, filtered_detections_path):
   for i, detection in enumerate(map(float, utils.rl(filtered_detections_path))):  # Convert strings to floats
   # write frame + detection ROI for debugging
-    utils.draw_rect(utils.get_frame(input_video_path, detection), )
+    utils.draw_rect(utils.get_frame(input_video_path, detection), *roi)
   return
 
 if __name__ == "__main__":
-  # All output files are saved in folders named after their function, i.e. detect, filter, etc. ##########
+  # INTRO ##########
+  # All output files are saved in folders named after their function, i.e. detect, filter, etc.
+  # /INTRO ##########
 
   # INIT ##########
   #input_video_path = 'test/videos/1m_dk.mp4'
@@ -102,7 +104,7 @@ if __name__ == "__main__":
   # /PIPELINE ##########
 
   # LOGGING ##########
-  write_filtered_frames()
+  write_filtered_frames(input_video_path, roi, 'output/filter/dk_detections.txt')
   # /LOGGING ##########
 
   # PIPELINE ##########
