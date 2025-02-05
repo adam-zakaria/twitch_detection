@@ -11,6 +11,7 @@ def detect(input_video_path, roi, output_detections_path):
   ffprobe.get_resolution(input_video_path)
   print('We process every 20 frames, and the detect is completing videos at about 1/4 their time.')
   print('Detect running')
+  log = []
   with open(output_detections_path, 'w') as f:
     for frame_index, frame in enumerate(utils.get_frames(input_video_path), start=1):
       if frame_index % 20 != 0: continue # process every 20th frame
@@ -29,6 +30,8 @@ def detect(input_video_path, roi, output_detections_path):
           print(f'****************************')
           detection_time = frame_index / fps  # Frame index divided by FPS gives the time in seconds
           utils.wa(f"{detection_time:.2f}\n", output_detections_path)  # Write the detection time to the file
+          log.append({'timestamp': detection_time, 'text': text})
+  utils.w(log, output_detections_path)
 
 # Process a video and extract OCR text from each frame
 def filter(input_video_path, input_detections_path, output_filtered_path):
@@ -80,11 +83,13 @@ def concat(input_clips_path, output_folder):
   print(f"Concatenated video saved in {output_folder}/output.mp4.")
   return output_folder
 
-def write_filtered_frames(input_video_path, filtered_detections_path):
+def write_filtered_frames(input_video_path, roi, filtered_detections_path):
+  utils.mkdir('filter/images')  
+
   for i, detection in enumerate(map(float, utils.rl(filtered_detections_path))):  # Convert strings to floats
   # write frame + detection ROI for debugging
-    utils.draw_rect(utils.get_frame(input_video_path, detection), *roi)
-  return
+    img = utils.draw_rect(utils.get_frame(input_video_path, detection), *roi)
+    cv2.imwrite(f'filter/images/{detection}.jpg', img) # correctly formats depending on ext provided
 
 if __name__ == "__main__":
   # INTRO ##########

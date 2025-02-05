@@ -16,3 +16,7 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
 # Current
 * Get a pro twitch stream that definitely has double kills. Though...Bound's stream definitely had a double kill. So let's investigate why that one didn't work? That'd be on GPU. Maybe GPU has unmerged code.
 * Processing every 20th frame could be an issue
+
+* Part of what we're wondering is are we capturing all of the information that we need to capture to do post morterm? I'm tempted to capture the results objects and write them - worst case we can work from the results to a more distilled representation.
+
+But actually results don't even include timestamps...Which makes sense - it's just given frames.
