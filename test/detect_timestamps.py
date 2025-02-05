@@ -10,7 +10,7 @@ logging.getLogger("ppocr").disabled = True
 # Initialize the PaddleOCR model once for detection.
 ocr = PaddleOCR(use_angle_cls=False, lang='en', show_log=False, use_gpu=True)
 
-def detect_timestamps(input_video_path, roi, timestamps, output_detections_path):
+def detect_timestamps(input_video_path, roi, timestamps, output_folder, return_timestamps=False):
     """
     Processes a video and runs OCR detection on frames at specific timestamps.
     
@@ -25,14 +25,13 @@ def detect_timestamps(input_video_path, roi, timestamps, output_detections_path)
     """
     print('Detect timestamps executing')
     # Ensure the output directory exists.
-    utils.rm_mkdir(os.path.dirname(output_detections_path))
+    utils.rm_mkdir(os.path.dirname(output_folder))
     detections_log = []
     timestamps_lines = []
     results = []
-    
-    for t in timestamps:
+
+    for t, frame in utils.get_frames(input_video_path, timestamps=timestamps):
         # Retrieve the frame at the given timestamp.
-        frame = utils.get_frame(input_video_path, t)
         if frame is None:
             print(f"Could not retrieve frame at {t} seconds.")
             continue
@@ -56,9 +55,9 @@ def detect_timestamps(input_video_path, roi, timestamps, output_detections_path)
             result schema (code): https://paddlepaddle.github.io/PaddleOCR/main/en/quick_start.html#use-by-code
 
             We're guessing that detections happen at 'line granularity' meaning each line is a detection (we initially thought maybe locality mattered more, i.e. a paragraph would be single detection, we're guessing it's several)
-
+            
             A timestamp is one frame and may include several detections, i.e. output like the following is normal:
-
+            
             Text detected at 5777.71
             Text detected at 5777.71
             """
@@ -77,10 +76,11 @@ def detect_timestamps(input_video_path, roi, timestamps, output_detections_path)
     
     #result = "\n".join(str(f) for f in floats)
     timestamps_lines = "\n".join(str(t) for t in timestamps_lines)
-    utils.w(timestamps_lines, output_detections_path)
-    utils.jd(detections_log, 'output/detect/detections.json')
-    utils.jd(results, 'output/detect/results.json')
+    utils.w(timestamps_lines, utils.opj(output_folder, 'dk_detections.txt'))
+    utils.jd(detections_log, utils.opj(output_folder, 'text_detections.json'))
+    utils.jd(results, utils.opj(output_folder, 'paddle_results_all.json'))
     return detections_log
+
 
 # Example usage:
 if __name__ == "__main__":
@@ -89,7 +89,10 @@ if __name__ == "__main__":
     # Define a list of timestamps (in seconds) at which to run detection.
     timestamps_to_check = [ 33.69, 1369.96, 1391.64, 3128.19, 5110.91, 5777.71, 7849.49 ]
 
-    output_file = "output/detect/detections.txt"
-    
-    detections = detect_timestamps(input_video, roi, timestamps_to_check, output_file)
-    print("Detection log:", detections)
+    #output_file = f"output/{utils.datetime()}/detect/detections.txt"
+    #detections = detect_timestamps(input_video, roi, timestamps_to_check, output_file)
+    #print("Detection log:", detections)
+
+    output_folder = f"output/{utils.ts()}/detect/"
+    detections = detect_timestamps(input_video, roi, timestamps_to_check, output_folder)
+    #print("Detection log:", detections)

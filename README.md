@@ -19,4 +19,17 @@ yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" -
 
 * Part of what we're wondering is are we capturing all of the information that we need to capture to do post morterm? I'm tempted to capture the results objects and write them - worst case we can work from the results to a more distilled representation.
 
-But actually results don't even include timestamps...Which makes sense - it's just given frames.
+Looking at confidence scores and bounding boxes is another option.
+
+Yeah im trying to decide if I want to split these into simpler functions or have a single one... if it is provided no timestamps, and no frame rate...welll....cv2 can automatically pull the fps...but I kind of like just getting the frames and not expecting to get the fps as well. It's 
+
+I just really don't want a tangle of code, so I'm investing early. It's slower moving now but we don't know what's going to happen. And it could make development faster eventually.
+
+with get_frames, there are times where we just want the frames, we don't need the timestamps, maybe we can have simple=True (just return frames)
+
+if timestamps=True
+return timestamps
+
+I guess we could do this ad nauseum, more flags to return more info.
+
+get_frames
