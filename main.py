@@ -1,7 +1,24 @@
-from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess; import cliptu.clip as clip; import cliptu.ffprobe as ffprobe; import sys; import time; import logging; logging.getLogger("ppocr").disabled = True
+from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess; import cliptu.clip as clip; import cliptu.ffprobe as ffprobe; import sys; import time; import logging; logging.getLogger("ppocr").disabled = True; import uuid
 
 # Initialize the PaddleOCR model
 ocr = PaddleOCR(use_angle_cls=False, lang='en', show_log=False, use_gpu=True) 
+
+def download_twitch_streams(streamers, output_path):
+    """
+    Open a subprocess for each twitch streamer, async. Subprocesses will exit when parent exits
+
+    Does not upload, need separate code.
+    """
+    print("Starting Twitch stream downloads"); downloaded_streams = []
+    output_path = utils.path(output_path)
+
+    for streamer in streamers:
+        # init folders
+        #utils.mkdir(output_path); streamer_output_path = os.path.join(output_path, streamer); os.makedirs(streamer_output_path, exist_ok=True); print(f"Waiting for and downloading {streamer}'s stream to {streamer_output_path}...")
+        utils.mkdir(output_path); streamer_output_path = output_path / streamer; utils.mkdir(streamer_output_path); print(f"Waiting for and downloading {streamer}'s stream to {streamer_output_path}...")
+        subprocess.Popen(['yt-dlp', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac', f'https://www.twitch.tv/{streamer}', '-o', f'{streamer_output_path}/{uuid.uuid4().hex}.%(ext)s'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # processes_have_not_run = False
+    return downloaded_streams
 
 # Process a video and extract OCR text from each frame
 def detect(input_video_path, roi, output_detections_path):
