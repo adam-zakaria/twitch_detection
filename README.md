@@ -14,6 +14,33 @@ pip install -e ~/Code/cliptu/backend/cliptu/
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:25-00:26"
 
 # Current
+
+2/5/25 630PM, signing off
+* Run debug_pipeline.py
+Understand why the output/{ts} folder is created but not detect, probably something with Path
+> /home/ubuntu/Code/twitch_detection/test/debug_pipeline.py(91)detect_timestamps()
+     90     breakpoint()
+---> 91     utils.w(timestamps_lines, utils.opj(output_folder, 'dk_detections.txt'))
+     92     utils.jd(detections_log, utils.opj(output_folder, 'text_detections.json'))
+
+ipdb> output_folder
+PosixPath('output/02_05_2025_23_29_32/detect')
+
+
+Traceback (most recent call last):
+  File "/home/ubuntu/Code/twitch_detection/test/debug_pipeline.py", line 112, in <module>
+    roi = (529, 441, 266, 131)  # (x, y, width, height)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Code/twitch_detection/test/debug_pipeline.py", line 91, in detect_timestamps
+    #print(f'output_folder: {output_folder}')
+  File "/home/ubuntu/Code/utils/utils/utils.py", line 332, in w
+    with open(fp, 'w') as f:
+         ^^^^^^^^^^^^^
+
+okay so detect is not getting made...
+
+
+Earlier:
 * Get a pro twitch stream that definitely has double kills. Though...Bound's stream definitely had a double kill. So let's investigate why that one didn't work? That'd be on GPU. Maybe GPU has unmerged code.
 * Processing every 20th frame could be an issue
 
@@ -33,3 +60,5 @@ return timestamps
 I guess we could do this ad nauseum, more flags to return more info.
 
 get_frames
+
+I'm lost. Yeah...capturing our highest level and most direct context are pretty important...maintaining context, that basically is the task. And no matter what it's complex. It can be avoided. But having alternate representations and making sane decisions along the way and having friends etc is how to manage it.

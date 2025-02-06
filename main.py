@@ -34,7 +34,8 @@ def detect(input_video_path, roi, output_detections_path):
   utils.w(log, output_detections_path)
 
 # Process a video and extract OCR text from each frame
-def filter(input_video_path, input_detections_path, output_filtered_path):
+def filter(input_detections_path, output_filtered_path):
+  breakpoint
   print("Filtering")
   utils.rm_mkdir(os.path.dirname(output_filtered_path))  # Ensure the output directory exists
 
@@ -83,13 +84,15 @@ def concat(input_clips_path, output_folder):
   print(f"Concatenated video saved in {output_folder}/output.mp4.")
   return output_folder
 
-def write_filtered_frames(input_video_path, roi, filtered_detections_path):
-  utils.mkdir('filter/images')  
-
+def write_filtered_frames(input_video_path, roi, filtered_detections_path, output_folder=utils.path('filter/images/')):
+  utils.mkdir(output_folder)  
+  print('write_filtered_frames()')
   for i, detection in enumerate(map(float, utils.rl(filtered_detections_path))):  # Convert strings to floats
   # write frame + detection ROI for debugging
     img = utils.draw_rect(utils.get_frame(input_video_path, detection), *roi)
-    cv2.imwrite(f'filter/images/{detection}.jpg', img) # correctly formats depending on ext provided
+    # cv2.imwrite(utils.opj(output_folder, f'{detection}.jpg'), img) # correctly formats depending on ext provided
+    print(f'Writing {output_folder / f"{detection}.jpg"}')
+    cv2.imwrite(output_folder / f'{detection}.jpg', img) # correctly formats depending on ext provided
 
 if __name__ == "__main__":
   # INTRO ##########
