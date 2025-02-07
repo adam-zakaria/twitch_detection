@@ -1,5 +1,7 @@
+__pycache__
 **.mp4
 **.mkv
+group_id.txt
 twitch_streams_time_range
 twitch_streams
 *.mp4

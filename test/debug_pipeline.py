@@ -20,7 +20,7 @@ logging.getLogger("ppocr").disabled = True
 # Initialize the PaddleOCR model once for detection.
 ocr = PaddleOCR(use_angle_cls=False, lang='en', show_log=False, use_gpu=True)
 
-def detect_timestamps(input_video_path, roi, output_folder, timestamps=None, yield_timestamps=False):
+def detect_timestamps(input_video_path, roi, output_folder, timestamps=None):
     """
     Processes a video and runs OCR detection on frames at specific timestamps.
     
@@ -43,7 +43,7 @@ def detect_timestamps(input_video_path, roi, output_folder, timestamps=None, yie
     timestamps_lines = []
     results = []
 
-    for t, frame in utils.get_frames(input_video_path, timestamps=timestamps, yield_timestamps=yield_timestamps):
+    for t, frame in utils.get_frames(input_video_path, timestamps=timestamps, yield_timestamps=True):
         # Retrieve the frame at the given timestamp.
         if frame is None:
             print(f"Could not retrieve frame at {t} seconds.")
@@ -97,6 +97,30 @@ def detect_timestamps(input_video_path, roi, output_folder, timestamps=None, yie
     return detections_log
 
 
+def add_filtered_detections_json(filtered_detections_path, all_detections_path, ts):
+    """
+    filtered_detections_path:
+        twitch_detection/test/output/02_06_2025_19_53_02/filter/dk_detections.txt
+        33.69
+        1369.96
+        ...
+    all_detections_path:
+        twitch_detection/test/output/02_06_2025_19_53_02/detect/text_detections.json
+        [{
+            "timestamp": 5.016666666666667,
+            "text": "ITz So Frasty"
+        },...]
+    """
+    found = []
+    for detection in utils.rl(filtered_detections_path):
+        for obj in utils.jl(all_detections_path):
+            # compare floats to 5th place
+            if round(obj['timestamp'], 5) == round(float(detection), 5):
+                found.append(obj)
+    #utils.jd(found, f'output/{ts}/filter/filtered.json')
+    utils.jd(found, f'output/{ts}/filter/filtered.json')
+
+
 # Example usage:
 if __name__ == "__main__":
     # input_video = '/home/ubuntu/Code/twitch_detection/twitch_streams/Bound/329ca4963e5a4bccbe1fae83f83d5549.mp4'
@@ -104,19 +128,19 @@ if __name__ == "__main__":
     # timestamps_to_check = [ 33.69, 1369.96, 1391.64, 3128.19, 5110.91, 5777.71, 7849.49 ]
     # output_folder = f"output/{utils.ts()}/detect/"
     # detections = detect_timestamps(input_video, roi,  output_folder, timestamps=timestamps_to_check)
-
-    input_video_path = '/home/ubuntu/Code/twitch_detection/test/videos/4m _dk.mp4'
-    output_folder = utils.path(f"output/{utils.ts()}")
+    input_video_path = 'twitch_streams/Luciid_TW/968de62a68014c8c82bb8e7af0265ccb.mp4.part'
+    #input_video_path = '/home/ubuntu/Code/twitch_detection/test/videos/1m_dk.mp4'
+    ts = utils.ts()
+    output_folder = utils.path(f"output/{ts}")
     detect_folder = output_folder / 'detect'
     filter_folder = output_folder / 'filter'
-
     roi = (529, 441, 266, 131)  # (x, y, width, height)
 
-    detections = detect_timestamps(input_video_path, roi, detect_folder, yield_timestamps=True)
-
-    #filter('output/detect/dk_detections.txt', 'output/filter/dk_detections.txt')
+    detections = detect_timestamps(input_video_path, roi, detect_folder)
     main.filter(detect_folder / 'dk_detections.txt', filter_folder / 'dk_detections.txt')
-
-    #write_filtered_frames(input_video_path, roi, 'output/filter/dk_detections.txt')
-
     main.write_filtered_frames(input_video_path, roi, filter_folder / 'dk_detections.txt', output_folder=filter_folder / 'images')
+    #add_filtered_detections_json('/home/ubuntu/Code/twitch_detection/test/output/02_06_2025_23_56_14/filter/dk_detections.txt', '/home/ubuntu/Code/twitch_detection/test/output/02_06_2025_23_56_14/detect/text_detections.json', '02_06_2025_23_56_14')
+    
+    add_filtered_detections_json(filter_folder /'dk_detections.txt', detect_folder / 'text_detections.json')
+
+

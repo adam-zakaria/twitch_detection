@@ -14,6 +14,47 @@ pip install -e ~/Code/cliptu/backend/cliptu/
 yt-dlp -S vcodec:h265,acodec:aac "https://www.youtube.com/watch?v=Kl5QHzEwbLQ" --download-sections "*00:25-00:26"
 
 # Current
+Think we need to figure out why we get '.part'. Maybe because we stop from a signal. Maybe just run for some amount of time.
+
+
+We crashed on:
+    input_video_path = 'twitch_streams/Luciid_TW/968de62a68014c8c82bb8e7af0265ccb.mp4.part'
+554m
+
+ubuntu@ip-172-31-75-23:~/Code/twitch_detection/test$ py debug_pipeline.py 
+Detect timestamps executing
+
+
+[h264 @ 0x5da9741aca00] error while decoding MB 8 27, bytestream -17
+output_folder: output/02_07_2025_00_32_16/detect
+Filtering
+The path does not exist: output/02_07_2025_00_32_16/filter
+No detections found.
+write_filtered_frames()
+Traceback (most recent call last):
+  File "/home/ubuntu/Code/twitch_detection/test/debug_pipeline.py", line 141, in <module>
+    main.write_filtered_frames(input_video_path, roi, filter_folder / 'dk_detections.txt', output_folder=filter_folder / 'images')
+    │                          │                 │    │                                                  └ PosixPath('output/02_07_2025_00_32_16/filter')
+    │                          │                 │    └ PosixPath('output/02_07_2025_00_32_16/filter')
+    │                          │                 └ (529, 441, 266, 131)
+    │                          └ 'twitch_streams/Luciid_TW/968de62a68014c8c82bb8e7af0265ccb.mp4.part'
+    └ <module 'main' from '/home/ubuntu/Code/twitch_detection/main.py'>
+  File "/home/ubuntu/Code/twitch_detection/main.py", line 107, in write_filtered_frames
+    for i, detection in enumerate(map(float, utils.rl(filtered_detections_path))):  # Convert strings to floats
+ValueError: could not convert string to float: 'None'
+
+Testing on Lucid's stream, here are the file sizes
+
+ubuntu@ip-172-31-75-23:~/Code/twitch_detection/test$ space /home/ubuntu/Code/twitch_detection/test/twitch_streams/Luciid_TW/4a201cb06cb542ff82a467a23815b0ab.mp4 
+7.1M    
+/home/ubuntu/Code/twitch_detection/test/twitch_streams/Luciid_TW/4a201cb06cb542ff82a467a23815b0ab.mp4
+
+ubuntu@ip-172-31-75-23:~/Code/twitch_detection/test$ space /home/ubuntu/Code/twitch_detection/test/twitch_streams/Luciid_TW/10cf9a4fe77a44d0a16f136c6ed05116.mp4.part 
+1.3G    /home/ubuntu/Code/twitch_detection/test/twitch_streams/Luciid_TW/10cf9a4fe77a44d0a16f136c6ed05116.mp4.part
+
+ubuntu@ip-172-31-75-23:~/Code/twitch_detection/test$ space /home/ubuntu/Code/twitch_detection/test/twitch_streams/Luciid_TW/968de62a68014c8c82bb8e7af0265ccb.mp4.part 
+554M    /home/ubuntu/Code/twitch_detection/test/twitch_streams/Luciid_TW/968de62a68014c8c82bb8e7af0265ccb.mp4.part
+
 
 2/5/25 630PM, signing off
 * Run debug_pipeline.py

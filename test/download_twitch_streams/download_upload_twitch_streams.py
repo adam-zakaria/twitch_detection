@@ -56,13 +56,13 @@ def download_twitch_streams(streamers, output_path):
 
 if __name__ == "__main__":
     # Define the streamers and output folder
-    streamers = ['Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite',
-                 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
+    streamers = ['formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
     download_twitch_streams(streamers, 'twitch_streams')
 
     # Get and print the parent's process group id.
     pgid = os.getpgid(os.getpid())
     print(f"Parent process PGID: {pgid}")
+    utils.w(pgid, 'group_id.txt')
 
     # Provide the CLI command to kill the entire process group.
     print(f"To kill the entire process group from the CLI, run:")
