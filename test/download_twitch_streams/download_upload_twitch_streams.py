@@ -15,6 +15,10 @@ Yeah so longer term we'll figure something out. For now, we just
 By default subprocess.popen will spawn them under the same group id as the parent.
 So you can find one pid, get the group id, then kill the group
 
+6145
+ps -o pid,pgid,comm -p 6145
+ps -o pid,pgid,comm -p 6337
+
 $ ps -o pid,pgid,comm -p 3275
     PID    PGID COMMAND
    3275    3139 ffmpeg
@@ -46,6 +50,8 @@ def download_twitch_streams(streamers, output_path):
                 '-S', 'vcodec:h265,acodec:aac',
                 f'https://www.twitch.tv/{streamer}',
                 '-o', f'{streamer_output_path}/{uuid.uuid4().hex}.%(ext)s'
+                #'-o', f'{streamer}.%(ext)s'
+                #'-o', f'renegade.%(ext)s'
             ],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
@@ -56,14 +62,20 @@ def download_twitch_streams(streamers, output_path):
 
 if __name__ == "__main__":
     # Define the streamers and output folder
-    streamers = ['formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
+    #streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
+    streamers = ['renegade']
+    # streamers = ['renegade']
     download_twitch_streams(streamers, 'twitch_streams')
 
     # Get and print the parent's process group id.
     pgid = os.getpgid(os.getpid())
     print(f"Parent process PGID: {pgid}")
-    utils.w(pgid, 'group_id.txt')
+    utils.w(str(pgid), 'group_id.txt')
 
     # Provide the CLI command to kill the entire process group.
     print(f"To kill the entire process group from the CLI, run:")
-    print(f"kill -9 -{pgid}")
+    # kill
+    # print(f"kill -9 -{pgid}")
+
+    # ctrl+c (SIGINT)
+    print(f"kill -2 -{pgid}")
