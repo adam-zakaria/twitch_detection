@@ -52,4 +52,10 @@ Exiting normally, received signal 2.
 
 # hmmmm it seems like the -2 does not work with waiting streams (i.e. the streamer is offline). I guess that's fine because we want them waiting. And we can still kill them with -9
 
-# Okay...sooo....
+"""
+Next, let's write out a big diagram with the plan.
+
+Immediately, we still need to test double kill detection on twitch streams. So maybe get a few hours? 
+
+Okay and actually...don't do this on the GPU...
+"""

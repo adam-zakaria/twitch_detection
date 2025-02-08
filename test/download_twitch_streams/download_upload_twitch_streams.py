@@ -62,8 +62,8 @@ def download_twitch_streams(streamers, output_path):
 
 if __name__ == "__main__":
     # Define the streamers and output folder
-    #streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
-    streamers = ['renegade']
+    streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
+    #streamers = ['renegade']
     # streamers = ['renegade']
     download_twitch_streams(streamers, 'twitch_streams')
 
