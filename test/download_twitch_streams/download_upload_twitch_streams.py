@@ -3,6 +3,7 @@ import subprocess
 import uuid
 import signal
 import utils.utils as utils
+import cliptu.s3 as s3
 
 """
 # process management
@@ -62,20 +63,16 @@ def download_twitch_streams(streamers, output_path):
 
 if __name__ == "__main__":
     # Define the streamers and output folder
-    streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
-    #streamers = ['renegade']
-    # streamers = ['renegade']
-    download_twitch_streams(streamers, 'twitch_streams')
+    # streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
+    # download_twitch_streams(streamers, 'twitch_streams')
 
     # Get and print the parent's process group id.
-    pgid = os.getpgid(os.getpid())
-    print(f"Parent process PGID: {pgid}")
-    utils.w(str(pgid), 'group_id.txt')
+    # pgid = os.getpgid(os.getpid())
+    # print(f"Parent process PGID: {pgid}")
+    # utils.w(str(pgid), 'group_id.txt')
 
-    # Provide the CLI command to kill the entire process group.
-    print(f"To kill the entire process group from the CLI, run:")
-    # kill
-    # print(f"kill -9 -{pgid}")
+    # print(f"To kill the entire process group from the CLI, run:")
+    # # ctrl+c (SIGINT)
+    # print(f"kill -2 -{pgid}")
 
-    # ctrl+c (SIGINT)
-    print(f"kill -2 -{pgid}")
+    s3.upload_folder('twitch_streams','twitch_streams')
