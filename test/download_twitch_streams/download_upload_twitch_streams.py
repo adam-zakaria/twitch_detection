@@ -75,4 +75,5 @@ if __name__ == "__main__":
     # # ctrl+c (SIGINT)
     # print(f"kill -2 -{pgid}")
 
-    s3.upload_folder('twitch_streams','twitch_streams')
+    # s3.upload_folder('twitch_streams','twitch_streams')
+    s3.download_folder('s3://cliptu/twitch_streams','twitch_streams')

@@ -7,13 +7,12 @@ import logging
 import sys
 sys.path.insert(0, '/home/ubuntu/Code/twitch_detection')
 # from main import write_filtered_frames, filter
+import cliptu.clip as clip
 import main as main
+import subprocess
 
 #input_video_path = '/home/ubuntu/Code/twitch_detection/twitch_streams/Bound/329ca4963e5a4bccbe1fae83f83d5549.mp4'
 #roi = (529, 441, 266, 131)
-
-
-
 
 logging.getLogger("ppocr").disabled = True
 
@@ -121,6 +120,38 @@ def add_filtered_detections_json(filtered_detections_path, all_detections_path, 
     utils.jd(found, f'output/{ts}/filter/filtered.json')
 
 
+def extract(input_video_path, filter_folder, output_video_folder):
+  utils.rm_mkdir(output_video_folder)  # Ensure the output directory exists
+  detections = [float(line.strip()) for line in utils.rl(filter_folder / 'dk_detections.txt')]
+
+  for detection in detections:
+    print(f"Extracting clip around {detection}s...")
+    clip.extract_clip(input_video_path, f'{output_video_folder}/{str(detection).replace(".", "_")}.mp4', detection-8, detection+1)
+  print(f"Clips saved in {output_video_folder}.")
+
+def concat(input_clips_path, output_folder):
+  utils.rm_mkdir(output_folder)  # Ensure the output directory exists
+
+  print("Starting clip concatenation.")
+  for clip_path in sorted(utils.ls(input_clips_path)):
+    clip_path = os.path.basename(clip_path)
+    print(f"Adding {clip_path} to concatenation list.")
+    utils.wa(f"file '../extract/{clip_path}'\n", f'{output_folder}/concat_files.txt')  # path to clip must be relative to path of concat_files.txt
+
+  concat_command = f"ffmpeg -y -hide_banner -loglevel error -f f'{output_folder}/concat_files.txt' concat -safe 0 -i  -c copy f'{output_folder}/output.mp4'"
+  subprocess.run(
+    [
+      "ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "concat", 
+      "-safe", "0", "-i", f"{output_folder}/concat_files.txt", 
+      "-c", "copy", f"{output_folder}/output.mp4"
+    ],
+    check=True  # Raises an error if the command fails
+  )
+
+  print(f"Concatenated video saved in {output_folder}/output.mp4.")
+  return output_folder
+
+
 # Example usage:
 if __name__ == "__main__":
     # input_video = '/home/ubuntu/Code/twitch_detection/twitch_streams/Bound/329ca4963e5a4bccbe1fae83f83d5549.mp4'
@@ -128,19 +159,28 @@ if __name__ == "__main__":
     # timestamps_to_check = [ 33.69, 1369.96, 1391.64, 3128.19, 5110.91, 5777.71, 7849.49 ]
     # output_folder = f"output/{utils.ts()}/detect/"
     # detections = detect_timestamps(input_video, roi,  output_folder, timestamps=timestamps_to_check)
-    input_video_path = 'twitch_streams/Luciid_TW/968de62a68014c8c82bb8e7af0265ccb.mp4.part'
     #input_video_path = '/home/ubuntu/Code/twitch_detection/test/videos/1m_dk.mp4'
+
+    # init ##########
+    #input_video_path = '/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/Bound/52a1dac2e5b941fe99ce392239d833a1.mp4'
+    input_video_path = '/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/royal2/7a5027362731493a928a306fa054f3ed.mp4'
     ts = utils.ts()
+    #ts = '02_09_2025_03_10_25'
     output_folder = utils.path(f"output/{ts}")
     detect_folder = output_folder / 'detect'
     filter_folder = output_folder / 'filter'
+    extract_folder = output_folder / 'extract'
+    concat_folder = output_folder / 'concat'
     roi = (529, 441, 266, 131)  # (x, y, width, height)
 
+    # run pipeline ##########
     detections = detect_timestamps(input_video_path, roi, detect_folder)
     main.filter(detect_folder / 'dk_detections.txt', filter_folder / 'dk_detections.txt')
+
     main.write_filtered_frames(input_video_path, roi, filter_folder / 'dk_detections.txt', output_folder=filter_folder / 'images')
-    #add_filtered_detections_json('/home/ubuntu/Code/twitch_detection/test/output/02_06_2025_23_56_14/filter/dk_detections.txt', '/home/ubuntu/Code/twitch_detection/test/output/02_06_2025_23_56_14/detect/text_detections.json', '02_06_2025_23_56_14')
-    
-    add_filtered_detections_json(filter_folder /'dk_detections.txt', detect_folder / 'text_detections.json')
+    add_filtered_detections_json(filter_folder /'dk_detections.txt', detect_folder / 'text_detections.json', ts)
+
+    extract(input_video_path, filter_folder, extract_folder)
+    concat(extract_folder, concat_folder)
 
 
