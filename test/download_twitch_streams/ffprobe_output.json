@@ -1,0 +1,50 @@
+{
+    "/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/output/Tripppey/02_11_2025_18_59_03/extract/79_73333333333333.mp4": {
+        "programs": [],
+        "streams": [
+            {
+                "codec_name": "h264",
+                "width": 1920,
+                "height": 1080,
+                "avg_frame_rate": "1593000/26549",
+                "duration": "8.849667"
+            }
+        ]
+    },
+    "/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/output/royal2/02_11_2025_19_44_43/extract/155_78333333333333.mp4": {
+        "programs": [],
+        "streams": [
+            {
+                "codec_name": "h264",
+                "width": 1920,
+                "height": 1080,
+                "avg_frame_rate": "60/1",
+                "duration": "8.816667"
+            }
+        ]
+    },
+    "/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/output/formal/02_11_2025_19_23_23/extract/238_56666666666666.mp4": {
+        "programs": [],
+        "streams": [
+            {
+                "codec_name": "h264",
+                "width": 1920,
+                "height": 1080,
+                "avg_frame_rate": "684000/11401",
+                "duration": "7.600667"
+            }
+        ]
+    },
+    "/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/output/Bound/02_11_2025_20_06_30/extract/42_1.mp4": {
+        "programs": [],
+        "streams": [
+            {
+                "codec_name": "h264",
+                "width": 1920,
+                "height": 1080,
+                "avg_frame_rate": "1644000/27401",
+                "duration": "9.066667"
+            }
+        ]
+    }
+}
