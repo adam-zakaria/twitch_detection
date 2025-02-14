@@ -7,6 +7,52 @@ Concat works with this cmd:
   ]
 But weirdly, it works with 4.4.2, but not 7.1. It does have that weird freeze between clips but not a big deal.
 
+Hmmmm maybe it doesn't work...but it seems like clip extraction is not working correctly...
+
+ffmpeg -y -loglevel error -ss 230.56666666666666 -i /home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/formal/20cd578ba8fd43d4bd09e6c539c80c55.mp4 -to 9.0 -c copy output/formal/02_11_2025_19_23_23/extract/238_56666666666666.mp4
+
+# Extract clip
+Extract clip breaks because of the seek times are not on key frames. Reencoding makes this much better, though the video still freezes for 1s
+
+## Addressing the video freezing
+The issue is likely that fast seeking (using -ss before -i) jumps to the nearest keyframe, which may occur before your exact start time. When you re-encode, the decoder starts with an incomplete GOP (Group of Pictures), so the first few frames may not decode properly—resulting in a frozen video until the full GOP is available.
+
+Since you can’t afford to decode from the beginning of a 3‑hour video, here are some workarounds:
+
+Two-Step Process:
+
+Step 1: Quickly extract a slightly longer segment using -ss before -i (fast seeking) so that you get close to your desired start time.
+Step 2: Then, on the much shorter extracted clip (say 10–15 seconds), perform a frame-accurate trim by placing -ss after -i (which decodes only a few seconds).
+This lets you get the correct cut without processing the entire 3‑hour file accurately.
+
+Accept a Minor Glitch:
+If the freeze is only about one second and acceptable for your use case, you might choose to live with it. However, if that’s not acceptable, the two-step approach is recommended.
+
+Additional Filtering:
+Another option is to use filters (like the trim filter) on the short segment, but again, this generally works best on a shorter clip rather than re-encoding a 3‑hour file frame-accurately.
+
+In summary, the freeze is due to the boundaries imposed by keyframes when using fast seeking. A two-step process—fast extraction followed by a precise trim on the shorter clip—can often be a good compromise when dealing with long videos.
+
+# Sometimes -c copy works for extract clip, sometimes it doesn't
+That's correct, and it all comes down to how the extraction boundaries align with the underlying media data. When you use -c copy, ffmpeg doesn't re-encode; it simply copies the existing encoded packets. This means:
+
+Keyframe Boundaries:
+The copy method works best if your start time lands on a keyframe (for video) and on proper packet boundaries (for audio). If the extraction point cuts in the middle of a Group of Pictures (GOP) or in the middle of an audio packet, you can end up with corrupted or missing data.
+
+Container and Timestamp Issues:
+Some files have more robust indexing or metadata that allows a clean cut, while others may not. If the timestamps or indexing information aren't perfectly aligned, -c copy might sometimes yield a clean cut and sometimes not.
+
+Inconsistent Behavior:
+Since the behavior of -c copy depends on the structure of the source file and the precise extraction time, you might see inconsistent results from file to file or even within the same file if the cut points are not ideal.
+
+In short, -c copy works reliably only when the extraction points coincide with valid boundaries in the media streams. If they don't, you might experience issues like frozen video, audio dropouts, or other artifacts. If you need consistent results regardless of boundary alignment, re-encoding (with properly chosen codecs and parameters) is usually the safer option, even though it's more time-consuming.
+
+
+
+
+
+
+
 # ffmpeg versions
 We were on ffmpeg 4.4.2 (Ubuntu) but the latest is 7.1 so we want to update.
 

@@ -165,24 +165,28 @@ if __name__ == "__main__":
 
     # init ##########
     #input_video_path = '/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/Bound/52a1dac2e5b941fe99ce392239d833a1.mp4'
-    input_video_path = '/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/royal2/7a5027362731493a928a306fa054f3ed.mp4'
-    ts = utils.ts()
-    #ts = '02_09_2025_03_10_25'
-    output_folder = utils.path(f"output/{ts}")
-    detect_folder = output_folder / 'detect'
-    filter_folder = output_folder / 'filter'
-    extract_folder = output_folder / 'extract'
-    concat_folder = output_folder / 'concat'
-    roi = (529, 441, 266, 131)  # (x, y, width, height)
+    #input_video_path = '/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/royal2/7a5027362731493a928a306fa054f3ed.mp4'
+    #input_video_path = '/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/formal/20cd578ba8fd43d4bd09e6c539c80c55.mp4'
+    # ts = utils.ts()
+    # ts = '02_09_2025_03_10_25'
+    #ts = '02_11_2025_19_23_23'
+    for streamer, ts, input_video_path in [('formal','02_11_2025_19_23_23','/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/formal/20cd578ba8fd43d4bd09e6c539c80c55.mp4'),('Bound', '02_11_2025_20_06_30', '/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/Bound/52a1dac2e5b941fe99ce392239d833a1.mp4'),('royal2','02_11_2025_19_44_43','/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/royal2/7a5027362731493a928a306fa054f3ed.mp4'),('Tripppey','02_11_2025_18_59_03','/home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/Tripppey/72cf03aaf74d4006a44aefeb0eb9710e.mp4')]:
+      output_folder = utils.path(f"output/{streamer}/{ts}")
+      detect_folder = output_folder / 'detect'
+      filter_folder = output_folder / 'filter'
+      extract_folder = output_folder / 'extract'
+      concat_folder = output_folder / 'concat'
+      roi = (529, 441, 266, 131)  # (x, y, width, height)
 
-    # run pipeline ##########
-    detections = detect_timestamps(input_video_path, roi, detect_folder)
-    main.filter(detect_folder / 'dk_detections.txt', filter_folder / 'dk_detections.txt')
+      # run pipeline ##########
+      # detections = detect_timestamps(input_video_path, roi, detect_folder)
+      # main.filter(detect_folder / 'dk_detections.txt', filter_folder / 'dk_detections.txt')
 
-    main.write_filtered_frames(input_video_path, roi, filter_folder / 'dk_detections.txt', output_folder=filter_folder / 'images')
-    add_filtered_detections_json(filter_folder /'dk_detections.txt', detect_folder / 'text_detections.json', ts)
+      # main.write_filtered_frames(input_video_path, roi, filter_folder / 'dk_detections.txt', output_folder=filter_folder / 'images')
+      # add_filtered_detections_json(filter_folder /'dk_detections.txt', detect_folder / 'text_detections.json', ts)
 
-    extract(input_video_path, filter_folder, extract_folder)
-    concat(extract_folder, concat_folder)
+      extract(input_video_path, filter_folder, extract_folder)
+      concat(extract_folder, concat_folder)
+      # /home/ubuntu/Code/twitch_detection/test/download_twitch_streams/output/formal/02_11_2025_19_23_23/filter/dk_detections.txt
 
 
