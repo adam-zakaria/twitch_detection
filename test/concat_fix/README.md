@@ -1,4 +1,4 @@
-# Concat works
+# Concat does not work
 Concat works with this cmd:
   cmd = [
       "ffmpeg", "-y", "-hide_banner", "-f", "concat", 
@@ -10,6 +10,19 @@ But weirdly, it works with 4.4.2, but not 7.1. It does have that weird freeze be
 Hmmmm maybe it doesn't work...but it seems like clip extraction is not working correctly...
 
 ffmpeg -y -loglevel error -ss 230.56666666666666 -i /home/ubuntu/Code/twitch_detection/test/download_twitch_streams/twitch_streams/formal/20cd578ba8fd43d4bd09e6c539c80c55.mp4 -to 9.0 -c copy output/formal/02_11_2025_19_23_23/extract/238_56666666666666.mp4
+
+# Trying clip.concatenate_clips
+This is all with streams concat clips (not just individual clips)
+
+I thought this was promising initially because it seemed like out of Royal2, Bound, Formal, and Trippey, Formal's clips were the problematic ones. It almost seems like the last clip is typically the problematic one. Which makes me wonder if I only do 3 instead of 4, will the 3rd become problematic. Regardless, this method does not result in a pristine concat. I need to reorganize the tests. Let's try 3 clips to see.
+
+Okay so bound, formal, royal2 works. i'm trying to understand at what point this breaks. Let's try different combos.
+
+Bound, trippey - Trippy is broken.
+
+trippy_concat.mp4 alone works, so it seems like there's some kind of compatibility issue with Trippy, which is weird because it was formal at first.
+
+Trippy, formall
 
 # Extract clip
 Extract clip breaks because of the seek times are not on key frames. Reencoding makes this much better, though the video still freezes for 1s
