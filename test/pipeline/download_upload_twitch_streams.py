@@ -63,17 +63,17 @@ def download_twitch_streams(streamers, output_path):
 
 if __name__ == "__main__":
     # Define the streamers and output folder
-    # streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
+    streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin']
     # download_twitch_streams(streamers, 'twitch_streams')
 
     # Get and print the parent's process group id.
-    # pgid = os.getpgid(os.getpid())
-    # print(f"Parent process PGID: {pgid}")
-    # utils.w(str(pgid), 'group_id.txt')
+    pgid = os.getpgid(os.getpid())
+    print(f"Parent process PGID: {pgid}")
+    utils.w(str(pgid), 'group_id.txt')
 
-    # print(f"To kill the entire process group from the CLI, run:")
+    print(f"To kill the entire process group from the CLI, run:")
     # # ctrl+c (SIGINT)
-    # print(f"kill -2 -{pgid}")
+    print(f"kill -2 -{pgid}")
 
-    # s3.upload_folder('twitch_streams','twitch_streams')
+    s3.upload_folder('twitch_streams','twitch_streams')
     s3.download_folder('s3://cliptu/twitch_streams','twitch_streams')

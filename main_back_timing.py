@@ -1,17 +1,16 @@
 import subprocess; import uuid; import sys; import cv2; import os; import glob; import utils.utils as utils; from itertools import pairwise; from datetime import timedelta
 
-# CURRENTLY BROKEN! :D
-# let's just write this our self. just get the length of one vid and os.ls the rest. maybe walk is recursive?
-def total_video_time():
-    # sums twitch_streams_time_range/{streamer}/*.mp4 (not .mp4.part)
-    folder_path = "twitch_streams_time_range"
-    total_seconds = sum(
-        float(subprocess.run(
-            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", os.path.join(root, file)],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-        ).stdout.strip() or 0)
-        for root, _, files in os.walk(folder_path) for file in files)
-    print(f"Total Duration: {str(timedelta(seconds=int(total_seconds)))}")
+"""
+This file is kept around for its __main__
+which provides args to conditionally execute different parts of the script, including timing code.
+
+So if there are no additional args: spawn downloading twitch streams (stays running (service / daemon))
+
+Then if it's between 6AM and 8AM and....
+hmmmm...not sure what process this time range is....it means that we only run the pipeline once during this timerange.
+
+And then we can run each part of the script individually as well..
+"""
 
 def download_twitch_streams(streamers, output_path):
     print("Starting Twitch stream downloads"); downloaded_streams = []
@@ -106,7 +105,6 @@ if __name__ == "__main__":
               utils.sleep(60) # check time every minute
         processed_this_time_range == False
         
-          
     else:
         if sys.argv[1] == 'download_twitch_streams':
             download_twitch_streams(streamers, streams_output_path)

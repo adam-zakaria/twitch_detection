@@ -1,4 +1,4 @@
-from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess; import cliptu.clip as clip; import cliptu.ffprobe as ffprobe; import sys; import time; import logging; logging.getLogger("ppocr").disabled = True; import uuid
+from paddleocr import PaddleOCR, draw_ocr; from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess; import cliptu.clip as clip; import cliptu.ffprobe as ffprobe; import sys; import time; import logging; logging.getLogger("ppocr").disabled = True; import uuid; import time
 
 # Initialize the PaddleOCR model
 ocr = PaddleOCR(use_angle_cls=False, lang='en', show_log=False, use_gpu=True) 
@@ -141,5 +141,3 @@ if __name__ == "__main__":
   elapsed_time = time.time() - start_time  # Calculate elapsed time
   print(f'Time to run: {elapsed_time}')
   # /FINISH BENCHMARKING ############
-
-
