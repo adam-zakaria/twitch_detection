@@ -1,56 +1,84 @@
-from PIL import Image; import os; import cv2; import utils.utils as utils; from itertools import pairwise; import subprocess; import cliptu.clip as clip; import cliptu.ffprobe as ffprobe; import sys; import time; import logging; logging.getLogger("ppocr").disabled = True; import uuid; import cliptu.s3 as s3
+import os
+import subprocess
+import uuid
+import time
+import logging
+import utils.utils as utils
+import cliptu.s3 as s3
+
+logging.getLogger("ppocr").disabled = True
 
 def download_twitch_streams(streamers, output_path):
     """
-    Open a subprocess for each twitch streamer, async. Subprocesses will exit when parent exits
+    Open a subprocess for each Twitch streamer, all in a separate process group.
 
-    Does not upload, need separate code.
+    The behavior of yt-dlp sigint and sigkill handling:
+    * on sigint, it will consolidate mp4.part to .mp4 and it will continue to run, but it will not continue to download (it seems to do nothing).
+    * sigkill kills the process
     """
-    print("Starting Twitch stream downloads"); downloaded_streams = []
+    print("Starting Twitch stream downloads")
     output_path = utils.path(output_path)
+    utils.mkdir(output_path)
+
+    group_leader_pid = None
+    processes = []
 
     for streamer in streamers:
-        # init folders
-        utils.mkdir(output_path); streamer_output_path = output_path / streamer; utils.mkdir(streamer_output_path); print(f"Waiting for and downloading {streamer}'s stream to {streamer_output_path}...")
-        subprocess.Popen(['yt-dlp', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac', f'https://www.twitch.tv/{streamer}', '-o', f'{streamer_output_path}/{uuid.uuid4().hex}.%(ext)s'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    # processes_have_not_run = False
+        # Setup folder for streamer
+        streamer_output_path = output_path / streamer
+        utils.mkdir(streamer_output_path)
+        print(f"Downloading {streamer}'s stream to {streamer_output_path}...")
 
-    pgid = os.getpgid(os.getpid())
-    print(f"Parent process PGID: {pgid}")
-    utils.w(str(pgid), 'gid.txt')
+        cmd = [
+            'yt-dlp', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac',
+            f'https://www.twitch.tv/{streamer}', '-o',
+            f'{streamer_output_path}/{uuid.uuid4().hex}.%(ext)s'
+        ]
 
-    print(f"To kill the entire process group from the CLI, run:")
-    # # ctrl+c (SIGINT)
-    print(f"kill -2 -{pgid}; kill -9 -{pgid}")
-    return pgid
+        if group_leader_pid is None:
+          # For the first subprocess, create a new process group.
+          p = subprocess.Popen(cmd, preexec_fn=lambda: os.setpgid(0, 0),
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+          group_leader_pid = p.pid
+        else:
+            # For subsequent processes, assign them to the existing process group.
+            def set_group():
+                os.setpgid(0, group_leader_pid)
+            p = subprocess.Popen(cmd, preexec_fn=set_group,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-"""
-Production twitch downlader and double kill compiler.
+        processes.append(p)
 
-Ensure no downloaders are already running (check with ps -aux)
-"""
+    print(f"Subprocesses are in group with leader PID: {group_leader_pid}")
+    utils.w(str(group_leader_pid), 'gid.txt')
+
+    print("To kill all download subprocesses (without killing the parent), run:")
+    print(f"kill -2 -{group_leader_pid}; sleep 2; kill -9 -{group_leader_pid}")
+    return group_leader_pid
 
 if __name__ == "__main__":
-  ran = False
-  streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg', 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin', 'cykul', 'Tripppey', 'royal2', 'bubudubu']
-  gid = download_twitch_streams(streamers, 'twitch_streams')
-  #sys.exit()
-  #x = 1
-  while True:
-    # 4AM in prod; kill the downloaders, upload streams, start downloaders
-    if utils.between(utils.now(), utils.now(4)) and (not ran):
-      print('4AM - time to sigint sigkill the downloaders, upload streams, start downloaders')
-      os.system(f'kill -2 -{gid}')
-      time.sleep(2)
-      os.system(f'kill -9 -{gid}')
-      s3.upload_folder('twitch_streams','twitch_streams')
-      os.system('rm -rf twitch_streams')
-      print('rm -rf twitch_streams')
-      ran = True
-    else:
-      print('Outside of time range, nothing to do.')
-      ran = False
-    time.sleep(60)
-    print('Sleeping for 60s')
+    ran = False
+    streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
+                 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
+                 'cykul', 'Tripppey', 'royal2', 'bubudubu']
+    group_leader_pid = download_twitch_streams(streamers, 'twitch_streams')
 
-
+    while True:
+        # At 4AM, signal the subprocesses to stop, upload streams, and restart downloaders.
+        if utils.between(utils.now(), utils.now(4)) and (not ran):
+            #print('4AM - time to terminate downloaders, upload streams, and restart downloaders.')
+            print('* Sleeping *')
+            time.sleep(20) # yt-dlp takes a little while to get started
+            os.system(f'kill -2 -{group_leader_pid}')
+            time.sleep(4)
+            print('* Waking *')
+            os.system(f'kill -9 -{group_leader_pid}')
+            s3.upload_folder('twitch_streams', 'twitch_streams') # We might want to explictly remove .mp4.part just in case
+            os.system('rm -rf twitch_streams')
+            print('Removed twitch_streams folder.')
+            ran = True
+        else:
+            print('Outside of time range, nothing to do.')
+            ran = False
+        time.sleep(60)
+        print('Sleeping for 60s')
