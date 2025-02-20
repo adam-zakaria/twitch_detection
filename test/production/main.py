@@ -56,29 +56,39 @@ def download_twitch_streams(streamers, output_path):
     print(f"kill -2 -{group_leader_pid}; sleep 2; kill -9 -{group_leader_pid}")
     return group_leader_pid
 
+import schedule
+import time
+import os
+# Import your utility modules and functions as needed
+# from your_module import utils, download_twitch_streams, s3
+
 if __name__ == "__main__":
-    ran = False
     streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
                  'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
-                 'cykul', 'Tripppey', 'royal2', 'bubudubu']
-    group_leader_pid = download_twitch_streams(streamers, 'twitch_streams')
+                 'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2']
+    download_twitch_streams(streamers, 'twitch_streams')
 
-    while True:
+    def daily_stream_task():
         # At 4AM, signal the subprocesses to stop, upload streams, and restart downloaders.
-        if utils.between(utils.now(), utils.now(4)) and (not ran):
-            #print('4AM - time to terminate downloaders, upload streams, and restart downloaders.')
-            print('* Sleeping *')
-            time.sleep(20) # yt-dlp takes a little while to get started
-            os.system(f'kill -2 -{group_leader_pid}')
-            time.sleep(4)
-            print('* Waking *')
-            os.system(f'kill -9 -{group_leader_pid}')
-            s3.upload_folder('twitch_streams', 'twitch_streams') # We might want to explictly remove .mp4.part just in case
-            os.system('rm -rf twitch_streams')
-            print('Removed twitch_streams folder.')
-            ran = True
-        else:
-            print('Outside of time range, nothing to do.')
-            ran = False
-        time.sleep(60)
-        print('Sleeping for 60s')
+        group_leader_pid = utils.r('gid.txt')
+        utils.pr('yellow', 'daily task!')
+        print('* Sleeping *')
+        os.system(f'kill -2 -{group_leader_pid}')
+        time.sleep(4)
+        print('* Waking *')
+        os.system(f'kill -9 -{group_leader_pid}')
+        s3.upload_folder('twitch_streams', 'twitch_streams')
+        os.system('rm -rf twitch_streams')
+        print('Removed twitch_streams folder.')
+        download_twitch_streams(streamers, 'twitch_streams')
+        return group_leader_pid
+
+    # Schedule the daily_task to run at 4:00 AM every day.
+    schedule.every().day.at("00:19").do(daily_stream_task)
+    schedule.every().day.at("00:22").do(daily_stream_task)
+    schedule.every().day.at("00:25").do(daily_stream_task)
+
+    # Continuously check for pending scheduled tasks.
+    while True:
+        schedule.run_pending()
+        time.sleep(1)  # Check every second for better precision.

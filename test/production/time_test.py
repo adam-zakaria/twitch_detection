@@ -31,6 +31,7 @@ Ensure no downloaders are already running (check with ps -aux)
 """
 
 if __name__ == "__main__":
+  """
   while True:
     # 4AM in prod; kill the downloaders, upload streams, start downloaders
     ran=False
@@ -40,5 +41,31 @@ if __name__ == "__main__":
       print('not between')
     time.sleep(60)
     print('Sleeping for 60s')
+  """
+  """
+  Long story short, the below is scratch and can be deleted :p
+  """
+  ran = False
+  ran2 = False
+  while True:
+      # At 4AM, signal the subprocesses to stop, upload streams, and restart downloaders.
+      if utils.between(utils.now(), utils.now(60)) and (not ran):
+          print(utils.between(utils.now(), utils.now(60)) and (not ran))
+          print('Between 1')
+          ran = True
+          #print(True and (not ran))
+      elif not utils.between(utils.now(), utils.now(60)):
+          ran = False
+          print('else')
+      if utils.between(utils.now(61), utils.now(120)) and (not ran):
+          ran2 = True
+          print('Between 2')
+      else:
+          ran2 = False
+      #time.sleep(60)
+      #print('Sleeping for 60s')
+
+
+
 
 
