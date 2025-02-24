@@ -3,20 +3,50 @@ import subprocess
 import uuid
 import time
 import logging
+import requests  # new import for making HTTP requests
 import utils.utils as utils
 import cliptu.s3 as s3
-
+import time
+from datetime import datetime, timedelta
 logging.getLogger("ppocr").disabled = True
+
+"""
+Manually kill processes without PID
+
+ps -aux | grep twitch | awk '{print $2}'
+# take output from above and add to below
+kill -9 -
+
+"""
+
+def log(message):
+    """
+    Prints the message locally and POSTs it to the log endpoint.
+    """
+    # Print the message to the console
+    print(message)
+    try:
+        # URL for your logging endpoint; adjust port/hostname as needed
+        url = "http://localhost:1337/logs"
+        # Build the payload JSON
+        payload = {"logs": message}
+        # POST the message as JSON to the log endpoint
+        response = requests.post(url, json=payload)
+        if response.status_code != 200:
+            print("Error posting log:", response.text)
+    except Exception as e:
+        print("Failed to post log:", e)
 
 def download_twitch_streams(streamers, output_path):
     """
     Open a subprocess for each Twitch streamer, all in a separate process group.
 
     The behavior of yt-dlp sigint and sigkill handling:
-    * on sigint, it will consolidate mp4.part to .mp4 and it will continue to run, but it will not continue to download (it seems to do nothing).
-    * sigkill kills the process
+    * on sigint, it will consolidate mp4.part to .mp4 and it will continue to run, 
+      but it will not continue to download.
+    * sigkill kills the process.
     """
-    print("Starting Twitch stream downloads")
+    log("Starting Twitch stream downloads")
     output_path = utils.path(output_path)
     utils.mkdir(output_path)
 
@@ -27,7 +57,7 @@ def download_twitch_streams(streamers, output_path):
         # Setup folder for streamer
         streamer_output_path = output_path / streamer
         utils.mkdir(streamer_output_path)
-        print(f"Downloading {streamer}'s stream to {streamer_output_path}...")
+        log(f"Downloading {streamer}'s stream to {streamer_output_path}...")
 
         cmd = [
             'yt-dlp', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac',
@@ -36,10 +66,10 @@ def download_twitch_streams(streamers, output_path):
         ]
 
         if group_leader_pid is None:
-          # For the first subprocess, create a new process group.
-          p = subprocess.Popen(cmd, preexec_fn=lambda: os.setpgid(0, 0),
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-          group_leader_pid = p.pid
+            # For the first subprocess, create a new process group.
+            p = subprocess.Popen(cmd, preexec_fn=lambda: os.setpgid(0, 0),
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            group_leader_pid = p.pid
         else:
             # For subsequent processes, assign them to the existing process group.
             def set_group():
@@ -49,44 +79,52 @@ def download_twitch_streams(streamers, output_path):
 
         processes.append(p)
 
-    print(f"Subprocesses are in group with leader PID: {group_leader_pid}")
+    log(f"Subprocesses are in group with leader PID: {group_leader_pid}")
     utils.w(str(group_leader_pid), 'gid.txt')
 
-    print("To kill all download subprocesses (without killing the parent), run:")
-    print(f"kill -2 -{group_leader_pid}; sleep 2; kill -9 -{group_leader_pid}")
+    log("To kill all download subprocesses (without killing the parent), run:")
+    log(f"kill -2 -{group_leader_pid}; sleep 2; kill -9 -{group_leader_pid}")
     return group_leader_pid
 
 import schedule
 import time
-import os
-# Import your utility modules and functions as needed
-# from your_module import utils, download_twitch_streams, s3
 
 if __name__ == "__main__":
-    streamers = ['renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
-                 'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
-                 'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2']
+    log(f'Starting job at {utils.now()} ################################')
+    streamers = [
+        'renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
+        'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
+        'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2'
+    ]
     download_twitch_streams(streamers, 'twitch_streams')
 
     def daily_stream_task():
-        # At 4AM, signal the subprocesses to stop, upload streams, and restart downloaders.
+        # At scheduled time, stop the download subprocesses, upload streams, and restart downloaders.
         group_leader_pid = utils.r('gid.txt')
-        utils.pr('yellow', 'daily task!')
-        print('* Sleeping *')
+        log(f'Daily task at {utils.now()} ################################')
+        log('* Sleeping *')
         os.system(f'kill -2 -{group_leader_pid}')
         time.sleep(4)
-        print('* Waking *')
+        log('* Waking *')
         os.system(f'kill -9 -{group_leader_pid}')
-        s3.upload_folder('twitch_streams', 'twitch_streams')
+        input_folder = 'twitch_streams'
+        output_folder = 'twitch_streams'
+        log(f'Uploading {input_folder} to {output_folder}')
+        s3.upload_folder(input_folder, output_folder)
         os.system('rm -rf twitch_streams')
-        print('Removed twitch_streams folder.')
+        log('Removed twitch_streams folder.')
         download_twitch_streams(streamers, 'twitch_streams')
         return group_leader_pid
 
-    # Schedule the daily_task to run at 4:00 AM every day.
-    schedule.every().day.at("00:19").do(daily_stream_task)
-    schedule.every().day.at("00:22").do(daily_stream_task)
-    schedule.every().day.at("00:25").do(daily_stream_task)
+    # Schedule the daily_stream_task to run at specified times.
+    # Compute the time 5 seconds from now
+    future_time = datetime.now() + timedelta(seconds=5)
+    # Format the time as HH:MM:SS (if your schedule library supports seconds)
+    time_str = future_time.strftime("%H:%M:%S")
+    schedule.every().day.at(time_str).do(daily_stream_task)
+    #schedule.every().day.at("16:29").do(daily_stream_task)
+    #schedule.every().day.at("00:22").do(daily_stream_task)
+    #schedule.every().day.at("00:25").do(daily_stream_task)
 
     # Continuously check for pending scheduled tasks.
     while True:

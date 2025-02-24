@@ -1,0 +1,1 @@
+We forgot we're using an AMI, but it's probably not fully updated. Ahh...So just use manual AMI.
