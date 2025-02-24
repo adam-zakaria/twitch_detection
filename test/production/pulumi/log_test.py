@@ -11,11 +11,11 @@ def log(message):
     print(message)
     try:
         # URL for your logging endpoint; adjust port/hostname as needed
-        url = "http://54.167.31.12/logs"
+        url = "http://54.167.31.12:1337/logs"
         # Build the payload JSON
         payload = {"logs": message}
         # POST the message as JSON to the log endpoint
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload,verify=False)
         if response.status_code != 200:
             print("Error posting log:", response.text)
     except Exception as e:
