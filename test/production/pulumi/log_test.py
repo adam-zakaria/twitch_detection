@@ -1,13 +1,5 @@
-import os
-import subprocess
-import uuid
-import time
 import logging
 import requests  # new import for making HTTP requests
-import utils.utils as utils
-import cliptu.s3 as s3
-import time
-from datetime import datetime, timedelta
 logging.getLogger("ppocr").disabled = True
 
 
@@ -30,5 +22,5 @@ def log(message):
         print("Failed to post log:", e)
 
 if __name__ == "__main__":
-    log(f'From GPU {utils.now()} ################################')
+    log(f'From GPU  ################################')
     
