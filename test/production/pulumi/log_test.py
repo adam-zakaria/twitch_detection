@@ -22,5 +22,5 @@ def log(message):
         print("Failed to post log:", e)
 
 if __name__ == "__main__":
-    log(f'From GPU  ################################')
+    log(f'From GPU PULUMI ################################')
     
