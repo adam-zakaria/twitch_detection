@@ -92,45 +92,7 @@ import schedule
 import time
 
 if __name__ == "__main__":
-    log(f'Starting job at {utils.ts()} ################################')
-    streamers = [
-        'renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
-        'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
-        'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2', 'HuNteR_Jjx', 'Alleesi', 'Cruvu'
-    ]
-    download_twitch_streams(streamers, 'twitch_streams')
-
-    def daily_stream_task():
-        # At scheduled time, stop the download subprocesses, upload streams, and restart downloaders.
-        group_leader_pid = utils.r('gid.txt')
-        log(f'Daily task at {utils.ts()} ################################')
-        log('* Sleeping *')
-        os.system(f'kill -2 -{group_leader_pid}')
-        time.sleep(4)
-        log('* Waking *')
-        os.system(f'kill -9 -{group_leader_pid}')
-        input_folder = 'twitch_streams'
-        output_folder = 'twitch_streams'
-        log(f'Uploading {input_folder} to {output_folder}')
-        s3.upload_folder(input_folder, output_folder)
-        log(f'Starting gpu')
-        os.system('./g4dn_xlarge_stop.sh')
-        os.system('rm -rf twitch_streams')
-        log('Removed twitch_streams folder.')
-        download_twitch_streams(streamers, 'twitch_streams')
-        return group_leader_pid
-
-    # Schedule the daily_stream_task to run at specified times.
-    # Compute the time 5 seconds from now
-    future_time = datetime.now() + timedelta(seconds=15) # 15s to give more time for yt-dlp to run
-    # Format the time as HH:MM:SS (if your schedule library supports seconds)
-    time_str = future_time.strftime("%H:%M:%S")
-    schedule.every().day.at(time_str).do(daily_stream_task)
-    #schedule.every().day.at("16:29").do(daily_stream_task)
-    #schedule.every().day.at("00:22").do(daily_stream_task)
-    #schedule.every().day.at("00:25").do(daily_stream_task)
-
-    # Continuously check for pending scheduled tasks.
-    while True:
-        schedule.run_pending()
-        time.sleep(1)  # Check every second for better precision.
+    log(f'From process.py ################################')
+    s3.download_folder('s3://cliptu/twitch_streams', 'twitch_streams')
+    log(f"Downloaded streamers: {utils.ls('twitch_streams')}")
+    # py run pipeline all streamsers.py?
