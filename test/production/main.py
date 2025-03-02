@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     # Schedule the daily_stream_task to run at specified times.
     # Compute the time 5 seconds from now
-    future_time = datetime.now() + timedelta(seconds=5)
+    future_time = datetime.now() + timedelta(seconds=3600)
     # Format the time as HH:MM:SS (if your schedule library supports seconds)
     time_str = future_time.strftime("%H:%M:%S")
     schedule.every().day.at(time_str).do(daily_stream_task)
