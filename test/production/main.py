@@ -121,14 +121,9 @@ if __name__ == "__main__":
         return group_leader_pid
 
     # Schedule the daily_stream_task to run at specified times.
-    # Compute the time 5 seconds from now
-    future_time = datetime.now() + timedelta(seconds=15) # 15s to give more time for yt-dlp to run
-    # Format the time as HH:MM:SS (if your schedule library supports seconds)
+    future_time = datetime.now() + timedelta(seconds=30)
     time_str = future_time.strftime("%H:%M:%S")
     schedule.every().day.at(time_str).do(daily_stream_task)
-    #schedule.every().day.at("16:29").do(daily_stream_task)
-    #schedule.every().day.at("00:22").do(daily_stream_task)
-    #schedule.every().day.at("00:25").do(daily_stream_task)
 
     # Continuously check for pending scheduled tasks.
     while True:
