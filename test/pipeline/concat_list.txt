@@ -1,2 +1,0 @@
-file 'preprocessed_clips/formal.mp4'
-file 'preprocessed_clips/tripppey.mp4'

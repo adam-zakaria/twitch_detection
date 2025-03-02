@@ -1,5 +1,5 @@
-Okay so we're doing pulumi
-spawn a gpu and run a script
+# Current
+Long story short Pulumi has become a pain in the ass so aws_cli will be used instead. Pulumi likely manages the complexity of highly complex use cases - i.e. long running machines, multiple cloud providers, etc. But for the foreseeable future, aws_cli seems to be the way forward. 
 
 # Getting pulumi working
 

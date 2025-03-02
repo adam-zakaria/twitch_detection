@@ -1,3 +1,38 @@
+# The concat that works!
+The concat with filter:
+
+@log_calls
+def concat_all(input_file_paths, output_file="output.mp4"):
+  if not input_file_paths:
+    raise ValueError("No input files provided.")
+
+  num_files = len(input_file_paths)
+
+  # Build the ffmpeg command starting with the input files.
+  ffmpeg_cmd = ["ffmpeg", "-y", "-hide_banner"]
+  for f in input_file_paths:
+    ffmpeg_cmd.extend(["-i", f])  # Add each file as an input
+
+  # Build the stream mapping string.
+  stream_mapping = "".join(f"[{i}:v:0][{i}:a:0]" for i in range(num_files))
+
+  # Append the concat filter
+  filter_complex = f"{stream_mapping}concat=n={num_files}:v=1:a=1[outv][outa]"
+
+  # Complete the ffmpeg command
+  ffmpeg_cmd.extend([
+    "-filter_complex", filter_complex,
+    "-map", "[outv]", "-map", "[outa]",
+    output_file
+  ])
+
+  # Print the command for debugging
+  print("Running command:", " ".join(ffmpeg_cmd))
+
+  # Execute the command
+  subprocess.run(ffmpeg_cmd, check=True)
+
+
 # Concat does not work
 Concat works with this cmd:
   cmd = [
@@ -99,8 +134,7 @@ Furthermore, it's not even definite that GPU acceleration will really help us. B
   ]
   """
   """
-  # reencode, works, a lot slower but fine.
-  # It's surprising we need to reencode but who 
+  # Thought it works, it does not (for this use case)
   cmd = [
       "ffmpeg", "-y", "-hide_banner", "-f", "concat", 
       "-safe", "0", "-i", f"{output_folder}/concat_files.txt", 
