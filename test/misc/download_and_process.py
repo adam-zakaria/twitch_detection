@@ -180,24 +180,36 @@ def concat(input_clips_path, output_folder):
     return output_folder
 
 @log_calls
-def concat_all(input_file_paths, concat_file):
-    """
-    Concatenates multiple video files into a single video.
-    """
-    utils.log("Starting overall clip concatenation.")
-    clip_paths = ''
-    for clip_path in input_file_paths:
-        utils.log(f"Adding {clip_path} to concatenation list.")
-        clip_paths += f"file '{clip_path}'\n"
-    utils.w(clip_paths, concat_file)
+def concat_all(input_file_paths, output_file="output.mp4"):
+  if not input_file_paths:
+    raise ValueError("No input files provided.")
 
-    cmd = [
-        "ffmpeg", "-y", "-hide_banner", "-f", "concat", 
-        "-safe", "0", "-i", concat_file, 
-        "output.mp4"
-    ]
-    subprocess.run(cmd, check=True)
-    utils.log("Concatenated video saved in output.mp4.")
+  num_files = len(input_file_paths)
+
+  # Build the ffmpeg command starting with the input files.
+  ffmpeg_cmd = ["ffmpeg", "-y", "-hide_banner"]
+  for f in input_file_paths:
+    ffmpeg_cmd.extend(["-i", f])  # Add each file as an input
+
+  # Build the stream mapping string.
+  stream_mapping = "".join(f"[{i}:v:0][{i}:a:0]" for i in range(num_files))
+
+  # Append the concat filter
+  filter_complex = f"{stream_mapping}concat=n={num_files}:v=1:a=1[outv][outa]"
+
+  # Complete the ffmpeg command
+  ffmpeg_cmd.extend([
+    "-filter_complex", filter_complex,
+    "-map", "[outv]", "-map", "[outa]",
+    output_file
+  ])
+
+  # Print the command for debugging
+  print("Running command:", " ".join(ffmpeg_cmd))
+
+  # Execute the command
+  subprocess.run(ffmpeg_cmd, check=True)
+
 
 if __name__ == "__main__":
     # Download twitch streams from S3.
@@ -237,8 +249,8 @@ if __name__ == "__main__":
     #        extract(input_video_path, filter_folder, extract_folder)
     #        concat(extract_folder, concat_folder)
     
-    streamer_compilations = glob.glob('output/*/*/concat/output.mp4')
-    if streamer_compilations:
-      concat_all(streamer_compilations, 'concat_files.txt')
+    compilation_paths = glob.glob('output/*/*/concat/output.mp4')
+    if compilation_paths:
+      concat_all(compilation_paths, 'output.mp4')
     else:
       utils.log('No files in concat_files.txt (none of the streamers have double kills), skipping concat_all()')
