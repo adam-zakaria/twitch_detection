@@ -1,2 +1,0 @@
-config:
-  pulumi-ec2-project:instance_type: spot
