@@ -180,7 +180,7 @@ def concat(input_clips_path, output_folder):
     return output_folder
 
 @log_calls
-def concat_all(input_file_paths, output_file_path):
+def concat_all(input_file_paths, concat_file):
     """
     Concatenates multiple video files into a single video.
     """
@@ -189,11 +189,11 @@ def concat_all(input_file_paths, output_file_path):
     for clip_path in input_file_paths:
         utils.log(f"Adding {clip_path} to concatenation list.")
         clip_paths += f"file '{clip_path}'\n"
-    utils.w(clip_paths, output_file_path)
+    utils.w(clip_paths, concat_file)
 
     cmd = [
         "ffmpeg", "-y", "-hide_banner", "-f", "concat", 
-        "-safe", "0", "-i", output_file_path, 
+        "-safe", "0", "-i", concat_file, 
         "output.mp4"
     ]
     subprocess.run(cmd, check=True)
@@ -201,43 +201,44 @@ def concat_all(input_file_paths, output_file_path):
 
 if __name__ == "__main__":
     # Download twitch streams from S3.
-    s3.download_folder('s3://cliptu/twitch_streams', 'twitch_streams')
+    # s3.download_folder('s3://cliptu/twitch_streams', 'twitch_streams')
 
     # Initialize OCR and pipeline parameters.
-    ocr = PaddleOCR(use_angle_cls=False, lang='en', show_log=False, use_gpu=True)
-    roi = (529, 441, 266, 131)  # (x, y, width, height)
+    #ocr = PaddleOCR(use_angle_cls=False, lang='en', show_log=False, use_gpu=True)
+    #roi = (529, 441, 266, 131)  # (x, y, width, height)
 
-    for streamer_path in utils.ls('twitch_streams'):
-        streamer = streamer_path.split('/')[1]
-        for input_video_path in utils.ls(streamer_path):
-            ts = utils.ts()
-            output_folder = utils.path(f"output/{streamer}/{ts}")
-            detect_folder = output_folder / 'detect'
-            filter_folder = output_folder / 'filter'
-            extract_folder = output_folder / 'extract'
-            concat_folder = output_folder / 'concat'
+    #for streamer_path in utils.ls('twitch_streams'):
+    #    streamer = streamer_path.split('/')[1]
+    #    for input_video_path in utils.ls(streamer_path):
+    #        ts = utils.ts()
+    #        output_folder = utils.path(f"output/{streamer}/{ts}")
+    #        detect_folder = output_folder / 'detect'
+    #        filter_folder = output_folder / 'filter'
+    #        extract_folder = output_folder / 'extract'
+    #        concat_folder = output_folder / 'concat'
 
-            # Run the pipeline.
-            detections = detect_timestamps(input_video_path, roi, detect_folder)
-            if not detections:
-              utils.log(f'In detect() no double kills detected for {input_video_path}, moving onto next video')
-              continue
-            filter(detect_folder / 'dk_detections.txt', filter_folder / 'dk_detections.txt')
-            write_filtered_frames(
-                input_video_path, 
-                roi, 
-                filter_folder / 'dk_detections.txt', 
-                output_folder=filter_folder / 'images'
-            )
-            add_filtered_detections_json(
-                filter_folder / 'dk_detections.txt', 
-                detect_folder / 'text_detections.json', 
-                filter_folder / 'filtered.json'
-            )
-            extract(input_video_path, filter_folder, extract_folder)
-            concat(extract_folder, concat_folder)
+    #        # Run the pipeline.
+    #        detections = detect_timestamps(input_video_path, roi, detect_folder)
+    #        if not detections:
+    #          utils.log(f'In detect() no double kills detected for {input_video_path}, moving onto next video')
+    #          continue
+    #        filter(detect_folder / 'dk_detections.txt', filter_folder / 'dk_detections.txt')
+    #        write_filtered_frames(
+    #            input_video_path, 
+    #            roi, 
+    #            filter_folder / 'dk_detections.txt', 
+    #            output_folder=filter_folder / 'images'
+    #        )
+    #        add_filtered_detections_json(
+    #            filter_folder / 'dk_detections.txt', 
+    #            detect_folder / 'text_detections.json', 
+    #            filter_folder / 'filtered.json'
+    #        )
+    #        extract(input_video_path, filter_folder, extract_folder)
+    #        concat(extract_folder, concat_folder)
     
-    if utils.r('concat_files.txt'):
-      concat_all(glob.glob('output/*/*/concat/output.mp4'), 'concat_files.txt')
+    streamer_compilations = glob.glob('output/*/*/concat/output.mp4')
+    if streamer_compilations:
+      concat_all(streamer_compilations, 'concat_files.txt')
     else:
       utils.log('No files in concat_files.txt (none of the streamers have double kills), skipping concat_all()')
