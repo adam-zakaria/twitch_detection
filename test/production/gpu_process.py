@@ -220,7 +220,8 @@ if __name__ == "__main__":
 
     for streamer_path in utils.ls('twitch_streams'):
         streamer = streamer_path.split('/')[1]
-        for input_video_path in utils.ls(streamer_path):
+        input_video_paths = [p for p in utils.ls('twitch_streams') if p.endswith(".mp4")] # filter .mp4s, avoiding .mp4.part
+        for input_video_path in input_video_paths:
             ts = utils.ts()
             output_folder = utils.path(f"output/{streamer}/{ts}")
             detect_folder = output_folder / 'detect'

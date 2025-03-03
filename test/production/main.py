@@ -96,7 +96,7 @@ if __name__ == "__main__":
     streamers = [
         'renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
         'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
-        'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2', 'HuNteR_Jjx', 'Alleesi', 'Cruvu'
+        'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2', 'HuNteR_Jjx', 'Alleesi', 'Cruvu', 'gunplexion'
     ]
     download_twitch_streams(streamers, 'twitch_streams')
 
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         log(f'Daily task at {utils.ts()} ################################')
         log('* Sleeping *')
         os.system(f'kill -2 -{group_leader_pid}')
-        time.sleep(4)
+        time.sleep(8)
         log('* Waking *')
         os.system(f'kill -9 -{group_leader_pid}')
         input_folder = 'twitch_streams'
@@ -121,7 +121,7 @@ if __name__ == "__main__":
         return group_leader_pid
 
     # Schedule the daily_stream_task to run at specified times.
-    future_time = datetime.now() + timedelta(seconds=30)
+    future_time = datetime.now() + timedelta(seconds=1800)
     time_str = future_time.strftime("%H:%M:%S")
     schedule.every().day.at(time_str).do(daily_stream_task)
 
