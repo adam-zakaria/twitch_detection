@@ -94,7 +94,7 @@ import time
 if __name__ == "__main__":
     log(f'Starting job at {utils.ts()} ################################')
     streamers = [
-        'renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
+        'frosty', 'renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
         'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
         'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2', 'HuNteR_Jjx', 'Alleesi', 'Cruvu', 'gunplexion'
     ]
