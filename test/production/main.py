@@ -125,7 +125,8 @@ if __name__ == "__main__":
         return group_leader_pid
 
     # Schedule the daily_stream_task to run at specified times.
-    future_time = datetime.now() + timedelta(seconds=1800)
+    #future_time = datetime.now() + timedelta(seconds=1800)
+    future_time = datetime.now() + timedelta(seconds=30)
     time_str = future_time.strftime("%H:%M:%S")
     schedule.every().day.at(time_str).do(daily_stream_task)
 

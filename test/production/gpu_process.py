@@ -221,7 +221,8 @@ if __name__ == "__main__":
 
     for streamer_path in utils.ls('twitch_streams'):
         streamer = streamer_path.split('/')[1]
-        input_video_paths = [p for p in utils.ls('twitch_streams') if p.endswith(".mp4") and not p.endswith(".temp.mp4")] # filter .mp4s, avoiding .temp.mp4
+        # input_video_paths = [p for p in utils.ls(streamer_path) if p.endswith(".mp4") and not p.endswith(".temp.mp4")] # filter .mp4s, avoiding .temp.mp4
+        input_video_paths = [p for p in utils.ls(streamer_path) if p.count('.') == 1]  # filter .mp4s, avoiding .temp.mp4 and .mp4.part
         utils.log(f'input_video_paths: {input_video_paths}')
         for input_video_path in input_video_paths:
             ts = utils.ts()
