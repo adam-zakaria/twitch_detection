@@ -93,6 +93,8 @@ import time
 
 if __name__ == "__main__":
     log(f'Starting job at {utils.ts()} ################################')
+    log(f'Removing twitch_streams from front')
+    utils.rm('twitch_streams')
     streamers = [
         'frosty', 'renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
         'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
@@ -105,6 +107,8 @@ if __name__ == "__main__":
         group_leader_pid = utils.r('gid.txt')
         log(f'Daily task at {utils.ts()} ################################')
         log('* Sleeping *')
+        s3.rm('s3://cliptu/twitch_streams')
+        log('Removing s3://cliptu/twitch_streams')
         os.system(f'kill -2 -{group_leader_pid}')
         time.sleep(8)
         log('* Waking *')
