@@ -119,7 +119,7 @@ if __name__ == "__main__":
         s3.upload_folder(input_folder, output_folder)
         log(f'Starting gpu')
         os.system('./g4dn_xlarge_stop.sh')
-        os.system('rm -rf twitch_streams')
+        utils.rm('twitch_streams')
         log('Removed twitch_streams folder.')
         download_twitch_streams(streamers, 'twitch_streams')
         return group_leader_pid
