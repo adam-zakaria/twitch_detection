@@ -211,6 +211,7 @@ def concat_all(input_file_paths, output_file="output.mp4"):
 
 
 if __name__ == "__main__":
+    utils.log(f'Downloading twitch_streams')
     # Download twitch streams from S3.
     s3.download_folder('s3://cliptu/twitch_streams', 'twitch_streams')
 
