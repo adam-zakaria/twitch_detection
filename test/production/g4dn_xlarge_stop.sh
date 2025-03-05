@@ -36,7 +36,7 @@ echo -e "Host $INSTANCE_NAME\n  HostName $INSTANCE_IP\n  User $SSH_USER\n  Ident
 
 # Run Python script remotely
 echo "🚀 Running Python script on GPU instance..."
-ssh "$INSTANCE_NAME" "rm -rf /home/ubuntu/Code/twitch_detection && git clone git@github.com:adam-zakaria/twitch_detection.git /home/ubuntu/Code/twitch_detection && cd /home/ubuntu/Code/twitch_detection/test/production && rm -rf twitch_streams && python gpu_process.py"
+ssh "$INSTANCE_NAME" "rm -rf /home/ubuntu/Code/twitch_detection && git clone git@github.com:adam-zakaria/twitch_detection.git /home/ubuntu/Code/twitch_detection && cd /home/ubuntu/Code/twitch_detection/test/production && python gpu_process.py"
 
 echo "🛑 Shutting down instance..."
 aws ec2 stop-instances --instance-ids "$INSTANCE_ID" --no-cli-pager > /dev/null 2>&1

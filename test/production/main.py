@@ -62,7 +62,7 @@ def download_twitch_streams(streamers, output_path):
         # yt-dlp --wait-for-video 600 -S, 'vcodec:h265,acodec:aac' https://www.twitch.tv/alleesi -o
         
         cmd = [
-            'yt-dlp', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac',
+            'yt-dlp', '--cookies', 'cookies.txt', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac',
             f'https://www.twitch.tv/{streamer}', '-o',
             f'{streamer_output_path}/{uuid.uuid4().hex}.%(ext)s'
         ]
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     streamers = [
         'frosty', 'renegade', 'formal', 'Luciid_TW', 'itzthelastshot', 'SpartanTheDogg',
         'SnakeBite', 'aPG', 'Bound', 'kuhlect', 'druk84', 'pzzznguin',
-        'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2', 'HuNteR_Jjx', 'Alleesi', 'Cruvu', 'gunplexion'
+        'cykul', 'Tripppey', 'royal2', 'bubudubu', 'mikwen', 'Ogre2', 'HuNteR_Jjx', 'Alleesi', 'Cruvu', 'gunplexion','tashi'
     ]
     download_twitch_streams(streamers, 'twitch_streams')
 
@@ -121,12 +121,13 @@ if __name__ == "__main__":
         os.system('./g4dn_xlarge_stop.sh')
         utils.rm('twitch_streams')
         log('Removed twitch_streams folder.')
-        download_twitch_streams(streamers, 'twitch_streams')
+        # download_twitch_streams(streamers, 'twitch_streams')
+        print("BE SURE TO UNCOMMENT THIS download_twitch_streams(streamers, 'twitch_streams'")
         return group_leader_pid
 
     # Schedule the daily_stream_task to run at specified times.
-    #future_time = datetime.now() + timedelta(seconds=1800)
-    future_time = datetime.now() + timedelta(seconds=30)
+    future_time = datetime.now() + timedelta(seconds=1800)
+    #future_time = datetime.now() + timedelta(seconds=30)
     time_str = future_time.strftime("%H:%M:%S")
     schedule.every().day.at(time_str).do(daily_stream_task)
 

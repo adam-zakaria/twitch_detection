@@ -1,0 +1,2 @@
+# Stream Times are off, what might be wrong?
+Cookies may need to be refreshed. Twitch Turbo removes ads and can be used with yt-dlp by copying the cookies from the cookies.txt extension. Otherwise, yt-dlp is not able to handle streams with ads (which all of them have) correctly. This can be inspected by downloading a stream and seeing if ads appear. If cookies are cleared from the browser then the cookie may need to be refreshed.
