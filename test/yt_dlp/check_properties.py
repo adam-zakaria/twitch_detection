@@ -54,7 +54,7 @@ if __name__ == '__main__':
   video_codec = 'h265'
   audio_codec = 'aac'
   for streamer in ['ItzTheLastShot', 'TchiKK', 'Preecisionn']:
-    pid = download_stream(streamer='TchiKK', output_folder='streams')
+    pid = download_stream(streamer=streamer, output_folder='streams')
   
   """
   Okay, having a tough time staying focused. This is being done so that there is something to show off.
