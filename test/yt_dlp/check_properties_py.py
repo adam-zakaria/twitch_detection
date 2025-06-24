@@ -1,26 +1,23 @@
-import os; import uuid; import subprocess; import happy_utils as utils; import sys; import threading
+import os; import uuid; import subprocess; import happy_utils as utils; import sys
 
-def process_yt_dlp_output(proc, output_path, video_codec, audio_codec):
-  for line in proc.stdout:
-    print(line.strip())
-    if '[download]' in line:
-      print(f'Download has started (PID {proc.pid})')
-      check_properties(file=output_path, video_codec=video_codec, audio_codec=audio_codec, pid=proc.pid)
-      break
+from yt_dlp import YoutubeDL
 
-def download_stream(streamer, output_folder='streams'):
-  output_path = f'{output_folder}/{uuid.uuid4().hex}.mp4'
-  #output_template = f'{output_folder}/%(title)s.%(ext)s'
+def hook(d):
+  print('hoook', flush=True)
+  if d['status'] == 'downloading':
+    print('Download started:', d['_filename'])  # Your custom hook here
 
-  cmd = [
-    'yt-dlp', '--cookies', 'cookies.txt', '--wait-for-video', '600',
-    '-S', 'vcodec:h265,acodec:aac', f'https://www.twitch.tv/{streamer}',
-    '-o', output_path
-  ]
-  proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-  # start thread
-  thread = threading.Thread(target=process_yt_dlp_output, args=(proc, output_path, video_codec, audio_codec))
-  thread.start()
+def download_stream(streamer='TchiKK', output_folder='streams'):
+  ydl_opts = {
+    'cookiefile': 'cookies.txt',
+    'quiet': True,            # suppress all output except errors
+    'wait_for_video': 600,
+    'progress_hooks': [hook],
+    'format_sort': ['vcodec:h265', 'acodec:aac'],
+    'outtmpl': f'{output_folder}/{uuid.uuid4().hex}.%(ext)s'
+  }
+  with YoutubeDL(ydl_opts) as ydl:
+    ydl.download([f'https://www.twitch.tv/{streamer}'])
 
 
 def check_properties(file='', video_codec='', audio_codec='', pid=''):
@@ -53,8 +50,9 @@ def check_properties(file='', video_codec='', audio_codec='', pid=''):
 if __name__ == '__main__':
   video_codec = 'h265'
   audio_codec = 'aac'
-  for streamer in ['ItzTheLastShot', 'TchiKK', 'Preecisionn']:
-    pid = download_stream(streamer='TchiKK', output_folder='streams')
+  #for streamer in ['ItzTheLastShot', 'TchiKK', 'Preecisionn']:
+  for streamer in ['TriPPPeY']:
+    pid = download_stream(streamer=streamer, output_folder='streams')
   
   """
   Okay, having a tough time staying focused. This is being done so that there is something to show off.
