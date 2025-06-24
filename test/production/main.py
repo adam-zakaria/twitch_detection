@@ -64,7 +64,7 @@ def download_twitch_streams(streamers, output_path):
         cmd = [
             'yt-dlp', '--cookies', 'cookies.txt', '--wait-for-video', '600', '-S', 'vcodec:h265,acodec:aac',
             f'https://www.twitch.tv/{streamer}', '-o',
-            f'{streamer_output_path}/{uuid.uuid4().hex}.%(ext)s'
+            f'{streamer_output_path}/{uuid.uuid4().hex}.mp4'
         ]
 
         if group_leader_pid is None:
@@ -84,7 +84,7 @@ def download_twitch_streams(streamers, output_path):
     log(f"Subprocesses are in group with leader PID: {group_leader_pid}")
     utils.w(str(group_leader_pid), 'gid.txt')
 
-    log("To kill all download subprocesses (without killing the parent), run:")
+    log("To kill all download subprocesses (without killing the parent), run: ./kill_pids.sh or")
     log(f"kill -2 -{group_leader_pid}; sleep 2; kill -9 -{group_leader_pid}")
     return group_leader_pid
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         utils.rm('twitch_streams')
         log('Removed twitch_streams folder.')
         # download_twitch_streams(streamers, 'twitch_streams')
-        print("BE SURE TO UNCOMMENT THIS download_twitch_streams(streamers, 'twitch_streams'")
+        log("BE SURE TO UNCOMMENT THIS download_twitch_streams(streamers, 'twitch_streams'")
         return group_leader_pid
 
     # Schedule the daily_stream_task to run at specified times.
