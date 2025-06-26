@@ -53,10 +53,3 @@ if __name__ == '__main__':
   #for streamer in ['ItzTheLastShot', 'TchiKK', 'Preecisionn']:
   for streamer in ['TriPPPeY']:
     pid = download_stream(streamer=streamer, output_folder='streams')
-  
-  """
-  Okay, having a tough time staying focused. This is being done so that there is something to show off.
-  Something to keep me busy and motivated while applying to jobs. Demonstrate my programming skills so I don't need to work for some shitty company.
-
-
-  """
