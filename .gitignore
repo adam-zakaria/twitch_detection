@@ -1,15 +1,23 @@
 streams/
+dist
+test/videos
+twitch_detections/cookies.txt
 
 /home/ubuntu/Code/twitch_detection/test/production/pulumi/access_token.txt
 test/production/pulumi/aws_credentials
 __pycache__
 **.mp4
+**.mov
 **.mkv
+
+
+*.mp4
+*.mov
+*.mkv
+
 group_id.txt
 twitch_streams_time_range
 twitch_streams
-*.mp4
-*.mkv
 detections
 tesseract_frames
 tesseract_output
