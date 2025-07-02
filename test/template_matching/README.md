@@ -1,0 +1,1 @@
+Running template_matching_folder.py on train/double_kill, there is no where that 5 adjacent frames do not have at least a .8 - that is, each clip with a double kill has at least one frame that is correctly identified.
