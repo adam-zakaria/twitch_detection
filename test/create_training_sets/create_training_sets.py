@@ -3,12 +3,12 @@ import math
 import happy_utils as utils
 
 # UPDATE THESE
-CLASS = 'double_kill'
-INPUT_FRAMES_PATH = '/Users/azakaria/Code/twitch_detections/test/opencv/extracted_frames_all'
-BASE_DEST_PATH = '/Users/azakaria/Code/twitch_detections/test/opencv/data'
+CLASS = 'no_double_kill'
+INPUT_FRAMES_PATH = '/Users/azakaria/Code/twitch_detections/test/frames/extracted_frames_all_no_dks'
+BASE_DEST_PATH = '/Users/azakaria/Code/twitch_detections/test/frames/data'
 
 # 1. Gather all frame paths
-frame_paths = utils.ls(INPUT_FRAMES_PATH)
+frame_paths = sorted(utils.ls(INPUT_FRAMES_PATH))  # sort frames for consistent numeric order
 num_frames  = len(frame_paths)
 
 # 2. Compute split indices
