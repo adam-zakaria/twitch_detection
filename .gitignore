@@ -1,30 +1,37 @@
-frames/
-streams/
-dist
-test/videos
-twitch_detections/cookies.txt
 
-/home/ubuntu/Code/twitch_detection/test/production/pulumi/access_token.txt
-test/production/pulumi/aws_credentials
-__pycache__
-**.mp4
-**.mov
-**.mkv
+# Exclude .DS_Store files
+**/.DS_Store
 
+# Exclude .webm files
+**/*.webm
 
-*.mp4
-*.mov
-*.mkv
+# Video and image files
+**/frames/
+**/streams/
+**/dist/
+**/test/videos/
+**/twitch_detections/cookies.txt
 
-group_id.txt
-twitch_streams_time_range
-twitch_streams
-detections
-tesseract_frames
-tesseract_output
-compare_medals
-detect
-filter
-extract
-concat
-test_download_folder
+# Specific files
+**/home/ubuntu/Code/twitch_detection/test/production/pulumi/access_token.txt
+**/test/production/pulumi/aws_credentials
+**/__pycache__/
+
+# Video file extensions
+**/*.mp4
+**/*.mov
+**/*.mkv
+
+# Other specific files and directories
+**/group_id.txt
+**/twitch_streams_time_range
+**/twitch_streams
+**/detections
+**/tesseract_frames
+**/tesseract_output
+**/compare_medals
+**/detect
+**/filter
+**/extract
+**/concat
+**/test_download_folder
