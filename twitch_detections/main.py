@@ -6,12 +6,17 @@ import schedule
 twitch_stream = twitch_stream.TwitchStream()
 twitch_stream.download_stream(streamer='formal')
 """
+streams = []
 for streamer in ['KingJay', 'HuNteR_Jjx', 'formal']:
-  ts = twitch_stream.TwitchStream(streamer=streamer)
-  threading.Thread(target=ts.download_stream, args=('streams',)).start()
+  stream = twitch_stream.TwitchStream(streamer=streamer)
+  threading.Thread(target=stream.download_stream, args=('streams',)).start()
+  streams.append(stream)
 
 # at 4AM, kill the threads
-schedule.every().day.at("04:00").do(ts.kill_threads)
+for stream in streams:
+  schedule.every().day.at("04:00").do(stream.kill_threads)
+
+# maybe we don't need to kill the threads...
 
 # get all the streams
 # restart the threads
