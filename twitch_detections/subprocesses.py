@@ -4,18 +4,19 @@ import threading
 import schedule
 from multiprocessing import Process
 
+streamers = ['mean3st', 'Walmahrt', 'ubernick' ]
 def main():
   processes = []
-  for streamer in ['Pzzznguin', 'spartanthedogg']:
+  for streamer in streamers:
     stream = twitch_stream.TwitchStream(streamer=streamer)
-    p = Process(target=stream.download_stream, args=('streams',))
+    p = stream.download_stream('streams')
     processes.append(p)
-    p.start()
 
-  time.sleep(10)
+  # time.sleep(10)
 
-  for p in processes:
-    p.terminate()
+  # for p in processes:
+  #   p.terminate()
+  #   p.join()
 
 if __name__ == "__main__":
   main()
