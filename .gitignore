@@ -21,6 +21,7 @@
 **/*.mp4
 **/*.mov
 **/*.mkv
+**/*.webm
 
 # Other specific files and directories
 **/group_id.txt
