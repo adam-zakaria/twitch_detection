@@ -20,12 +20,15 @@ def extract_all(input_path, output_path):
         raise IOError(f"Cannot open video: {input_path}")
 
     frame_idx = 0
+    fps = cap.get(cv2.CAP_PROP_FPS)
     # Read and save frames until the video ends
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-        filename = f"frame_{frame_idx:06d}.png"
+        timestamp = frame_idx / fps
+        timestamp_str = f"{int(timestamp // 3600):02}:{int((timestamp % 3600) // 60):02}:{int(timestamp % 60):02}.{int((timestamp * 1000) % 1000):03}"
+        filename = f"frame_{timestamp_str}.png"
         cv2.imwrite(os.path.join(output_path, filename), frame)
         frame_idx += 1
 
@@ -42,6 +45,7 @@ def reframe_video(input_path='', output_dir='', x=0, y=0, w=0, h=0):
     w: width of the ROI
     h: height of the ROI
     """
+    utils.mkdir(output_dir)
 
     if not Path(input_path).exists():
         sys.exit(f"Input file not found: {input_path}")
@@ -62,6 +66,7 @@ def reframe_video(input_path='', output_dir='', x=0, y=0, w=0, h=0):
         crop = frame[y:y+h, x:x+w]
         # Save each cropped frame as an image
         frame_output_path = os.path.join(output_dir, f'frame_{idx:06d}.png')
+        #breakpoint()
         cv2.imwrite(frame_output_path, crop)
 
         if idx % 100 == 0:
@@ -133,10 +138,7 @@ def template_match_folder(source_folder_path='', output_folder_path='', template
 
 if __name__ == "__main__":
     pass
-    # input_path = '/Users/azakaria/Code/twitch_detections/test/videos/aqua_only_dks.mov'
-    # output_path = '/Users/azakaria/Code/twitch_detections/test/videos/aqua_only_dks_reframe.mp4'
-    # ROI = (710, 479, 62, 52)
-    # reframe(input_path, output_path, ROI)
+
 
     # input_path = '/Users/azakaria/Code/twitch_detections/test/videos/aqua_only_dks_reframe.mp4'  # update this path
     # output_path = '/Users/azakaria/Code/twitch_detections/test/frames/extracted_frames_all_dks'
