@@ -23,6 +23,11 @@
 **/*.mkv
 **/*.webm
 
+# Images
+**/*.png
+**/*.jpeg
+**/*.jpg
+
 # Other specific files and directories
 **/group_id.txt
 **/twitch_streams_time_range

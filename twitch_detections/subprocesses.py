@@ -4,7 +4,7 @@ import threading
 import schedule
 from multiprocessing import Process
 
-streamers = ['mean3st', 'Walmahrt', 'ubernick' ]
+streamers = ['mean3st', 'Walmahrt', 'ubernick', 'Luciid_TW']
 def main():
   processes = []
   for streamer in streamers:

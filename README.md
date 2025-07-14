@@ -10,5 +10,9 @@ dist/twitch_detections-0.1.0.tar.gz
 or
 `pip install -e .` (works from anywhere)
 
+# Run
+`poetry shell`
+`pm2 start 'python subprocesses.py' --name 'subprocesses'`
+
 # Add packages to project
 poetry add <packages>
