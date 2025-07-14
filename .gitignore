@@ -28,6 +28,11 @@
 **/*.jpeg
 **/*.jpg
 
+# Image file extensions
+**/*.png
+**/*.jpg
+**/*.jpeg
+
 # Other specific files and directories
 **/group_id.txt
 **/twitch_streams_time_range
