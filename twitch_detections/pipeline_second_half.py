@@ -5,14 +5,14 @@ def template_match():
   # stub 
   return [2.3, 2.33, 2.34, 2.35, 5.0, 5.02, 5.04]
 
-def filter(timestamps):
+def filter(timestamps, min_gap=3.0):
   """
   Inputs: list of floats
   Outputs: list of floats separated by at least 1 second
   """
   filtered_timestamps = []
   for i, value in enumerate(timestamps):  # Convert values to floats
-    if i == 0 or (value - filtered_timestamps[-1] >= 1.0):
+    if i == 0 or (value - filtered_timestamps[-1] >= min_gap):
       filtered_timestamps.append(value)
   return filtered_timestamps
 
@@ -51,6 +51,9 @@ def concat(input_file_paths, output_file="output.mp4"):
   print("Running command:", " ".join(ffmpeg_cmd))
 
   # Execute the command
+  print("*"*100)
+  print(ffmpeg_cmd)
+  print("*"*100)
   subprocess.run(ffmpeg_cmd, check=True)
 
 if __name__ == "__main__":

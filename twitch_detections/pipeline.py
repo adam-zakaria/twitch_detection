@@ -32,10 +32,7 @@ filtered_timestamps = cliptu_utils.filter_timestamps(match_timestamps)
 
 # Extract clips
 # Would prefer 
-clip_folder = './clips'
-utils.mkdir(clip_folder)
+paths = []
 for timestamp in filtered_timestamps:
-  clip.extract_clip(f'lastshot.mp4', f'{clip_folder}/{timestamp}.mp4', timestamp, timestamp + 3)
-
-breakpoint()
-clip.concat(clip_folder=clip_folder)
+  paths.append(clip.extract_clip(stream_path, f'{timestamp}.mp4', timestamp-6, timestamp + 3))
+clip.concat(paths)
