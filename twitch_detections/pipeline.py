@@ -1,55 +1,41 @@
-import cliptu.utils as cliptu
+import cliptu.utils as cliptu_utils
+import cliptu.clip as clip
 import cv2
 import os
 import sys
 from pathlib import Path
 import happy_utils as utils
+import time
 
-"""
-def reframe_video(input_path='', output_dir='', x=0, y=0, w=0, h=0):
-    # Crop a video to a fixed ROI.
-    # input_path: path to the input video
-    # output_path: path to the output video
-    # x: x coordinate of the top-left corner of the ROI
-    # y: y coordinate of the top-left corner of the ROI
-    # w: width of the ROI
-    # h: height of the ROI
-
-    utils.mkdir(output_dir)
-
-    if not Path(input_path).exists():
-        sys.exit(f"Input file not found: {input_path}")
-
-    cap = cv2.VideoCapture(input_path)
-    if not cap.isOpened():
-        sys.exit(f"Cannot open video: {input_path}")
-
-    frame_cnt = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print(f"Processing {frame_cnt} frames…")
-    print(f"ROI = (x={x}, y={y}, w={w}, h={h})")
-
-    for idx, (ts,frame) in enumerate(cliptu.get_frames(input_path, yield_timestamps=True)):
-        crop = frame[y:y+h, x:x+w]
-        # Save each cropped frame as an image
-        frame_output_path = os.path.join(output_dir, f'frame_{ts:.3f}.png')
-        cv2.imwrite(frame_output_path, crop)
-
-        if idx % 100 == 0:
-            print(f"…{idx}/{frame_cnt}")
-
-    cap.release()
-"""
-
+# Initialize paths
 roi_frames_dir = './output'
-template_path = './template.png'
-stream_path = 'Luciid_TW (live) 2025-07-08 18_04 [323997590012].mp4'
-# x,y,w,h = 710, 479, 200, 200
-#cliptu.reframe_video(input_path=stream_path, output_dir='./output', x=710, y=479, w=200, h=200)
+template_path = '/Users/azakaria/Code/twitch_detections/twitch_detections/test/frame/double_kill_tighter.png'
+stream_path = 'lucid_3m.mp4' # dk at ~2:16
 
-roi_frames = cliptu.reframe_video_mem(input_path=stream_path, output_dir='./output', x=710, y=479, w=200, h=200, every_nth_frame=60)
+# Reframe video to an ROI, only take every 60th frame. This is very slow. There are options for speeding up, with ffmpeg maybe being 10x faster? https://chatgpt.com/share/6875d629-1a94-8013-9af4-001b34edfea4 Could be a pain. Leave it unless it's an issue :)
+print('Reframing video to an ROI')
+start_time = time.time()
+timestamps_and_frames = cliptu_utils.reframe_video_mem(input_path=stream_path, x=710, y=479, w=200, h=200, every_nth_frame=60)
+end_time = time.time()
+print(f'Reframing video to an ROI took {end_time - start_time} seconds')
 
-# template_match_dir = './template_match'
-# cliptu.template_match_folder_mem(source_folder_path=frames, output_folder_path=template_match_dir, template_image_path=template_path, log_file_path='./log.txt', threshold=.8)
-
+# Template match each frame
 template_match_dir = './template_match'
-cliptu.template_match_folder_mem(input_frames=roi_frames, output_folder_path=template_match_dir, template_image_path=template_path, log_file_path='./log.txt', threshold=.8)
+print('Template matching each frame')
+start_time = time.time()
+match_timestamps = cliptu_utils.template_match_folder(timestamps_and_frames=timestamps_and_frames, output_folder_path=template_match_dir, template_image_path=template_path, log_file_path='./log.txt', threshold=.8)
+end_time = time.time()
+print(f'Template matching each frame took {end_time - start_time} seconds')
+
+# Expecting template matches in template_match_dir
+filtered_timestamps = cliptu_utils.filter_timestamps(match_timestamps)
+
+# Extract clips
+# Would prefer 
+clip_folder = './clips'
+utils.mkdir(clip_folder)
+for timestamp in filtered_timestamps:
+  clip.extract_clip(f'lastshot.mp4', f'{clip_folder}/{timestamp}.mp4', timestamp, timestamp + 3)
+
+breakpoint()
+clip.concat(clip_folder=clip_folder)
