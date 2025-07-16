@@ -7,7 +7,7 @@ import subprocess
 import time
 
 procs = []
-for streamer in ['mean3st', 'Trunks', 'HuNteR_Jjx']:
+for streamer in ['Luciid_TW', 'Formal', 'frosty']:
   proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}"], preexec_fn=os.setsid)
   procs.append(proc)
 
