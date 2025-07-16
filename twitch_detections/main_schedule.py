@@ -11,12 +11,18 @@ for streamer in ['mean3st', 'Trunks', 'HuNteR_Jjx']:
   proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}"], preexec_fn=os.setsid)
   procs.append(proc)
 
-# schedule killer at 04:00 every day
+# schedule killing and restarting of processes
 for proc in procs:
+    # kill proc
     schedule.every().day.at("13:59").do(
         os.killpg,        # function reference
         proc.pid,         # first arg
         signal.SIGINT     # second arg
+    )
+
+    # restart proc
+    schedule.every().day.at("14:00").do(
+        proc.start()
     )
 
 while True:
