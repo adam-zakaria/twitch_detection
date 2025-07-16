@@ -1,13 +1,24 @@
 import twitch_detections.models.twitch_stream as twitch_stream
 import threading
 import schedule
+import os
+import signal
+import subprocess
+import time
 
-streams = []
-for streamer in ['KingJay', 'HuNteR_Jjx', 'formal']:
-  stream = twitch_stream.TwitchStream(streamer=streamer)
-  threading.Thread(target=stream.download_stream, args=('streams',)).start()
-  streams.append(stream)
+procs = []
+for streamer in ['mean3st', 'Trunks', 'HuNteR_Jjx']:
+  proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}"], preexec_fn=os.setsid)
+  procs.append(proc)
 
-# at 4AM, kill the threads
-for stream in streams:
-  schedule.every().day.at("04:00").do(stream.kill_threads)
+# schedule killer at 04:00 every day
+for proc in procs:
+    schedule.every().day.at("13:59").do(
+        os.killpg,        # function reference
+        proc.pid,         # first arg
+        signal.SIGINT     # second arg
+    )
+
+while True:
+  schedule.run_pending()
+  time.sleep(1)

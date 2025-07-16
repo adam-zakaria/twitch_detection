@@ -11,6 +11,12 @@ yt-dlp calls ffmpeg (subprocesses calling subprocesses).
 
 The threading and multiprocess and pool options are surprisingly complex for something so seemingly simple. Maybe LLMs just aren't great at this yet, but I'd advise reading the docs and example code (invest time to understand it deeply given how useful it is).
 
+Also, there is already a way to download multiple videos at once: Just pass the urls in :) Though it is single core.
+https://github.com/yt-dlp/yt-dlp/issues/1918
+
+And there is a wrapper that uses multiprocessing to download multiple at once.
+https://github.com/targetdisk/squid-dl
+
 # Speed
 Reframing is slow.
 
