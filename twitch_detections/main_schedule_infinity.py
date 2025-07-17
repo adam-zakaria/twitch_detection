@@ -22,7 +22,7 @@ Logging would be nice.
 """
 
 
-def start_procs(streamers, procs):
+def start_download_procs(streamers, procs):
   # Start downloads
   # clear out any old entries from process list
   procs.clear()
@@ -36,7 +36,7 @@ def start_procs(streamers, procs):
     f'{output_folder}/{streamer}-{utils.ts()}.mp4'], preexec_fn=os.setsid)
     procs.append(proc)
 
-def kill_procs(procs):
+def kill_download_procs(procs):
   # Kill processes
   print('Kill processes')
   for proc in procs:
@@ -53,32 +53,33 @@ def process_streams():
 #streamers = ['gunplexion', 'gamesager']
 streamers = ['pzzznguin'] 
 procs = []
-start_procs(streamers, procs)
+start_download_procs(streamers, procs)
 
 # generate times for testing
 from datetime import datetime, timedelta
 now = datetime.now()
 kill_time = (now + timedelta(minutes=1)).strftime("%H:%M")
 process_time = (now + timedelta(minutes=2)).strftime("%H:%M")
+restart_download_time = (now + timedelta(minutes=3)).strftime("%H:%M")
 
 # Kill downloads at 2PM everyday
 schedule.every().day.at(kill_time).do(
-  kill_procs,
+  kill_download_procs,
   procs
 )
 
+# Process streams
 schedule.every().day.at(process_time).do(
   process_streams
 )
 
+# Redownload streams
+schedule.every().day.at(restart_download_time).do(
+  start_download_procs,
+  streamers,
+  procs
+)
 
-## Start downloads at 201PM everyday
-#schedule.every().day.at("22:26").do(
-#  start_procs,
-#  streamers,
-#  procs
-#)
-#
 while True:
   schedule.run_pending()
   time.sleep(1)

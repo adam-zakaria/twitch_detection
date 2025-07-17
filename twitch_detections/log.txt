@@ -1,45 +1,36 @@
 Output Image path: ./template_match/0.0.png
-Confidence score: 0.5459
+Confidence score: 0.3334
 --------------------------------
 Output Image path: ./template_match/1.0.png
-Confidence score: 0.5492
+Confidence score: 0.5435
 --------------------------------
 Output Image path: ./template_match/2.0.png
-Confidence score: 0.4720
+Confidence score: 0.4102
 --------------------------------
 Output Image path: ./template_match/3.0.png
-Confidence score: 0.4852
+Confidence score: 0.5244
 --------------------------------
 Output Image path: ./template_match/4.0.png
-Confidence score: 0.4720
+Confidence score: 0.4658
 --------------------------------
 Output Image path: ./template_match/5.0.png
-Confidence score: 0.0000
+Confidence score: 0.5548
 --------------------------------
 Output Image path: ./template_match/6.0.png
-Confidence score: 0.4043
+Confidence score: 0.5534
 --------------------------------
 Output Image path: ./template_match/7.0.png
-Confidence score: 0.3902
+Confidence score: 0.5003
 --------------------------------
 Output Image path: ./template_match/8.0.png
-Confidence score: 0.4227
+Confidence score: 0.3604
 --------------------------------
 Output Image path: ./template_match/9.0.png
-Confidence score: 0.4094
+Confidence score: 0.4277
 --------------------------------
 Output Image path: ./template_match/10.0.png
-Confidence score: 0.4929
+Confidence score: 0.4889
 --------------------------------
 Output Image path: ./template_match/11.0.png
-Confidence score: 0.3609
---------------------------------
-Output Image path: ./template_match/12.0.png
-Confidence score: 0.5191
---------------------------------
-Output Image path: ./template_match/13.0.png
-Confidence score: 0.0000
---------------------------------
-Output Image path: ./template_match/14.0.png
-Confidence score: 0.4556
+Confidence score: 0.4279
 --------------------------------
