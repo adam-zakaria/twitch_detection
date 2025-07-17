@@ -1,3 +1,38 @@
+# Killing processes waiting for offline downloads
+## Investigating the underlying wait in ytdlp
+Given the following output from ytdlp
+WARNING: [twitch:stream] gamesager: The channel is not currently live
+[wait] Waiting for 00:10:00 - Press Ctrl+C to try now
+
+In yt-dlp codebase I did cmd+f for "Waiting for"
+
+And found the wait is a sleep()
+line 1709                time.sleep(1)
+/Users/azakaria/Library/Caches/pypoetry/virtualenvs/twitch-detections-UsLtH0Yo-py3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py
+
+## Killing
+Just doing 
+
+def kill_download_procs(proc):
+    os.killpg(proc.pid, signal.SIGKILL)
+Was not working, but 
+schedule.every(20).seconds.do(kill_download_procs, procs)
+Was working. And so I tried adding a lot kill calls:
+def kill_download_procs(proc):
+    os.killpg(proc.pid, signal.SIGKILL)
+    os.killpg(proc.pid, signal.SIGKILL)
+    os.killpg(proc.pid, signal.SIGKILL)
+but that did not work.
+But the following works, and yeah an exception gets called but that's fine and no zombies to speak of, at least visibly, and LLMs -1 for their advice on this one. This seems like a great solution for my use case.
+def kill_download_procs(procs):
+  # Kill processes
+  print('Kill processes')
+  for proc in procs:
+    while proc.poll() is None:
+        os.killpg(proc.pid, signal.SIGKILL)
+
+
+
 # Sub
 Running multiple processes in python is way less ergonomic than I'd expect, tt might partially be because this is a complex use case. 
 

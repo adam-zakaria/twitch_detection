@@ -16,6 +16,8 @@ def process(stream_path=''):
   * Concatenate clips
   """
   try:
+    utils.w('Starting process()','log.txt')
+
     # Initialize paths
     roi_frames_dir = './output'
     template_path = 'test/frame/double_kill_tighter.png'
@@ -31,7 +33,7 @@ def process(stream_path=''):
     template_match_dir = './template_match'
     print('Template matching each frame')
     start_time = time.time()
-    match_timestamps = cliptu_utils.template_match_folder(timestamps_and_frames=timestamps_and_frames, output_folder_path=template_match_dir, template_image_path=template_path, log_file_path='./log.txt', threshold=.8)
+    match_timestamps = cliptu_utils.template_match_folder(timestamps_and_frames=timestamps_and_frames, output_folder_path=template_match_dir, template_image_path=template_path, log_file_path='./template_match_log.txt', threshold=.8)
     end_time = time.time()
     print(f'Template matching each frame took {end_time - start_time} seconds')
 
@@ -50,6 +52,7 @@ def process(stream_path=''):
     for stream_path in glob.glob(f'output/**/stream/*.mp4'):
       utils.rm(stream_path)
   except:
+    utils.wa('Exception in process', 'log.txt')
     print('Exception in process')
 
 

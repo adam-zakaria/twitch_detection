@@ -16,10 +16,17 @@ Currently:
 
 * Exploring cases:
   * A streamer is not streaming - if retry is configured, os.killpg does not work. But it does not need to work - the point of killing a download is so that the stream can be processed and redownloaded with another filename. 
-  * A streamer is streaming - does try catch work?
+  * Restart works for a streamer streaming
+  * If there are two streamers streaming and one is live and one is not, it SEEMs like the WAIT of the not live will block the live processing. It's possible it's just the term that's blocked, and it's surprising because I'd think these are independent processes. Should have process write to files to confirm this is indeed getting blocked.
+
+  Weirdly though, the other streamers download is still working...
+
+  Yes confirmed, log.txt never gets written to.
+  * 
  
 Logging would be nice.
 """
+
 
 
 def start_download_procs(streamers, procs):
@@ -31,8 +38,8 @@ def start_download_procs(streamers, procs):
     output_folder = f'output/{streamer}/stream/'
     utils.mkdir(output_folder)
     # download and output to output/{streamer}/stream/{streamer.mp4}
-    #proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o',
-    proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o',
+    proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o',
+    #proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o',
     f'{output_folder}/{streamer}-{utils.ts()}.mp4'], preexec_fn=os.setsid)
     procs.append(proc)
 
@@ -40,9 +47,8 @@ def kill_download_procs(procs):
   # Kill processes
   print('Kill processes')
   for proc in procs:
-    os.killpg(proc.pid, signal.SIGINT)
-    # os.killpg(proc.pid, signal.SIGKILL)
-    proc.wait() # Best practice to fully cleanup subprocess
+    while proc.poll() is None:
+        os.killpg(proc.pid, signal.SIGKILL)
 
 def process_streams():
   # start processing once the streams are killed.
@@ -62,23 +68,29 @@ kill_time = (now + timedelta(minutes=1)).strftime("%H:%M")
 process_time = (now + timedelta(minutes=2)).strftime("%H:%M")
 restart_download_time = (now + timedelta(minutes=3)).strftime("%H:%M")
 
-# Kill downloads at 2PM everyday
-schedule.every().day.at(kill_time).do(
-  kill_download_procs,
-  procs
-)
+# Kill downloads
+schedule.every(20).seconds.do(kill_download_procs, procs)
 
-# Process streams
-schedule.every().day.at(process_time).do(
-  process_streams
-)
+# Weirdly, it seems to not be the double killpg call, but killpg being called again in 5s that does the trick. doing it 10 times doesnt work.
 
-# Redownload streams
-schedule.every().day.at(restart_download_time).do(
-  start_download_procs,
-  streamers,
-  procs
-)
+
+
+#schedule.every().day.at(kill_time).do(
+#  kill_download_procs,
+#  procs
+#)
+
+## Process streams
+#schedule.every().day.at(process_time).do(
+#  process_streams
+#)
+#
+## Redownload streams
+#schedule.every().day.at(restart_download_time).do(
+#  start_download_procs,
+#  streamers,
+#  procs
+#)
 
 while True:
   schedule.run_pending()
