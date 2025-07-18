@@ -49,10 +49,9 @@ def process(stream_path=''):
             )
             end_time = time.time()
             print(f'\ttook {end_time - start_time:.2f} seconds')
-            breakpoint()
             # Check for detections
-            if match_timestamps is []:
-              print('\tNo matches found, exiting process()')
+            if match_timestamps == []:
+              print('\tno matches found, exiting process()')
               return
 
         except Exception as e:

@@ -50,7 +50,7 @@ from datetime import datetime, timedelta
 now = datetime.now()
 kill_time = (now + timedelta(minutes=1)).strftime("%H:%M")
 process_time = (now + timedelta(minutes=2)).strftime("%H:%M")
-restart_download_time = (now + timedelta(minutes=6)).strftime("%H:%M")
+restart_download_time = (now + timedelta(minutes=3)).strftime("%H:%M")
 
 schedule.every().day.at(kill_time).do(
   kill_download_procs,
