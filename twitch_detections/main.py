@@ -29,7 +29,7 @@ def start_download_procs(streamers, procs):
 
 def kill_download_procs(procs):
   # Kill processes
-  print('kill_download_procs()')
+  print('Killing all downloads')
   for proc in procs:
     os.killpg(proc.pid, signal.SIGINT)
     # os.killpg(proc.pid, signal.SIGKILL)
@@ -41,7 +41,7 @@ def process_streams():
     pipeline.process(stream_path)
 
 # Start downloads now
-streamers = ['Gunplexion'] 
+streamers = ['tigger_en'] 
 procs = []
 start_download_procs(streamers, procs)
 

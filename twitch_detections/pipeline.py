@@ -16,8 +16,8 @@ def process(stream_path=''):
     * Concatenate clips
     """
     try:
-        utils.w('Starting process()', 'log.txt')
-        print('Logged: Starting process()')
+        utils.w('---- Starting process() ----', 'log.txt')
+        print('---- Starting process() ----')
 
         # Initialize paths
         roi_frames_dir = './output'
@@ -31,7 +31,7 @@ def process(stream_path=''):
                 input_path=stream_path, x=710, y=479, w=200, h=200, every_nth_frame=60
             )
             end_time = time.time()
-            print(f'Reframing video to an ROI took {end_time - start_time:.2f} seconds')
+            print(f'\ttook {end_time - start_time:.2f} seconds')
         except Exception as e:
             utils.wa('Error during reframing', 'log.txt')
             print(f'Error during reframing: {e}')
@@ -48,7 +48,13 @@ def process(stream_path=''):
                 threshold=0.8
             )
             end_time = time.time()
-            print(f'Template matching took {end_time - start_time:.2f} seconds')
+            print(f'\ttook {end_time - start_time:.2f} seconds')
+            breakpoint()
+            # Check for detections
+            if match_timestamps is []:
+              print('\tNo matches found, exiting process()')
+              return
+
         except Exception as e:
             utils.wa('Error during template matching', 'log.txt')
             print(f'Error during template matching: {e}')
@@ -101,7 +107,7 @@ def process(stream_path=''):
         print(f'Exception {e} in process')
 
     finally:
-        print('Function process() has completed.')
+        print('---- Finishing process() ----')
 
 
 if __name__ == "__main__":

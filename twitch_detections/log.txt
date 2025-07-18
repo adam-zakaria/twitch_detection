@@ -1,0 +1,1 @@
+---- Starting process() ----Error during reframingError during template matchingError filtering timestampsError during clip extractionError during concatenation
