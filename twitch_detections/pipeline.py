@@ -9,51 +9,100 @@ import time
 import glob
 
 def process(stream_path=''):
-  """
-  * Reframe
-  * Template match
-  * Extract clips
-  * Concatenate clips
-  """
-  try:
-    utils.w('Starting process()','log.txt')
+    """
+    * Reframe
+    * Template match
+    * Extract clips
+    * Concatenate clips
+    """
+    try:
+        utils.w('Starting process()', 'log.txt')
+        print('Logged: Starting process()')
 
-    # Initialize paths
-    roi_frames_dir = './output'
-    template_path = 'test/frame/double_kill_tighter.png'
+        # Initialize paths
+        roi_frames_dir = './output'
+        template_path = 'test/frame/double_kill_tighter.png'
 
-    # Reframe video to an ROI, only take every 60th frame. This is very slow. There are options for speeding up, with ffmpeg maybe being 10x faster? https://chatgpt.com/share/6875d629-1a94-8013-9af4-001b34edfea4 Could be a pain. Leave it unless it's an issue :)
-    print('Reframing video to an ROI')
-    start_time = time.time()
-    timestamps_and_frames = cliptu_utils.reframe_video_mem(input_path=stream_path, x=710, y=479, w=200, h=200, every_nth_frame=60)
-    end_time = time.time()
-    print(f'Reframing video to an ROI took {end_time - start_time} seconds')
+        # Reframe
+        print('Reframing video to an ROI')
+        try:
+            start_time = time.time()
+            timestamps_and_frames = cliptu_utils.reframe_video_mem(
+                input_path=stream_path, x=710, y=479, w=200, h=200, every_nth_frame=60
+            )
+            end_time = time.time()
+            print(f'Reframing video to an ROI took {end_time - start_time:.2f} seconds')
+        except Exception as e:
+            utils.wa('Error during reframing', 'log.txt')
+            print(f'Error during reframing: {e}')
 
-    # Template match each frame
-    template_match_dir = './template_match'
-    print('Template matching each frame')
-    start_time = time.time()
-    match_timestamps = cliptu_utils.template_match_folder(timestamps_and_frames=timestamps_and_frames, output_folder_path=template_match_dir, template_image_path=template_path, log_file_path='./template_match_log.txt', threshold=.8)
-    end_time = time.time()
-    print(f'Template matching each frame took {end_time - start_time} seconds')
+        # Template match
+        print('Template matching each frame')
+        try:
+            start_time = time.time()
+            match_timestamps = cliptu_utils.template_match_folder(
+                timestamps_and_frames=timestamps_and_frames,
+                output_folder_path='./template_match',
+                template_image_path=template_path,
+                log_file_path='./template_match_log.txt',
+                threshold=0.8
+            )
+            end_time = time.time()
+            print(f'Template matching took {end_time - start_time:.2f} seconds')
+        except Exception as e:
+            utils.wa('Error during template matching', 'log.txt')
+            print(f'Error during template matching: {e}')
 
-    # Expecting template matches in template_match_dir
-    filtered_timestamps = cliptu_utils.filter_timestamps(match_timestamps)
+        # Filter timestamps
+        print('Filtering timestamps')
+        try:
+            filtered_timestamps = cliptu_utils.filter_timestamps(match_timestamps)
+        except Exception as e:
+            utils.wa('Error filtering timestamps', 'log.txt')
+            print(f'Error filtering timestamps: {e}')
 
-    # Extract clips
-    paths = []
-    output_dir = './clips'
-    utils.mkdir(output_dir)
-    for timestamp in filtered_timestamps:
-      paths.append(clip.extract_clip(stream_path, f'{output_dir}/{timestamp}.mp4', timestamp-6, timestamp + 3))
-    clip.concat(paths)
+        # Extract clips
+        print('Extracting clips')
+        paths = []
+        output_dir = './clips'
+        utils.mkdir(output_dir)
+        print('Created output dir')
+        try:
+            for timestamp in filtered_timestamps:
+                path = clip.extract_clip(
+                    stream_path, f'{output_dir}/{timestamp}.mp4',
+                    timestamp - 6, timestamp + 3
+                )
+                paths.append(path)
+        except Exception as e:
+            utils.wa('Error during clip extraction', 'log.txt')
+            print(f'Error during clip extraction: {e}')
 
-    # remove processed streams
-    for stream_path in glob.glob(f'output/**/stream/*.mp4'):
-      utils.rm(stream_path)
-  except:
-    utils.wa('Exception in process', 'log.txt')
-    print('Exception in process')
+        # Concatenate
+        print('Concatenating clips')
+        try:
+            clip.concat(paths)
+            print(f'Concatenated {len(paths)} clips to {output_dir}')
+        except Exception as e:
+            utils.wa('Error during concatenation', 'log.txt')
+            print(f'Error during concatenation: {e}')
+
+        # Cleanup
+        print('Removing processed streams')
+        try:
+            for stream_path in glob.glob(f'output/**/stream/*.mp4'):
+                utils.rm(stream_path)
+            print('Removed processed streams')
+        except Exception as e:
+            utils.wa('Error removing processed streams', 'log.txt')
+            print(f'Error removing processed streams: {e}')
+
+    except Exception as e:
+        utils.wa('Exception in process', 'log.txt')
+        print(f'Exception {e} in process')
+
+    finally:
+        print('Function process() has completed.')
 
 
 if __name__ == "__main__":

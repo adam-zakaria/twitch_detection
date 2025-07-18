@@ -37,18 +37,20 @@ def start_download_procs(streamers, procs):
     # Create output folder
     output_folder = f'output/{streamer}/stream/'
     utils.mkdir(output_folder)
+    print(f'Starting download for {streamer}')
     # download and output to output/{streamer}/stream/{streamer.mp4}
-    proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o',
+    proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", '-q', "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o',
     #proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o',
     f'{output_folder}/{streamer}-{utils.ts()}.mp4'], preexec_fn=os.setsid)
     procs.append(proc)
 
 def kill_download_procs(procs):
   # Kill processes
-  print('Kill processes')
+  print('kill_download_procs()')
   for proc in procs:
-    while proc.poll() is None:
-        os.killpg(proc.pid, signal.SIGKILL)
+    os.killpg(proc.pid, signal.SIGINT)
+    # os.killpg(proc.pid, signal.SIGKILL)
+    proc.wait() # Best practice to fully cleanup subprocess
 
 def process_streams():
   # start processing once the streams are killed.
@@ -56,8 +58,7 @@ def process_streams():
     pipeline.process(stream_path)
 
 # Start downloads now
-#streamers = ['gunplexion', 'gamesager']
-streamers = ['pzzznguin'] 
+streamers = ['Gunplexion'] 
 procs = []
 start_download_procs(streamers, procs)
 
@@ -66,31 +67,24 @@ from datetime import datetime, timedelta
 now = datetime.now()
 kill_time = (now + timedelta(minutes=1)).strftime("%H:%M")
 process_time = (now + timedelta(minutes=2)).strftime("%H:%M")
-restart_download_time = (now + timedelta(minutes=3)).strftime("%H:%M")
+restart_download_time = (now + timedelta(minutes=6)).strftime("%H:%M")
 
-# Kill downloads
-schedule.every(20).seconds.do(kill_download_procs, procs)
+schedule.every().day.at(kill_time).do(
+  kill_download_procs,
+  procs
+)
 
-# Weirdly, it seems to not be the double killpg call, but killpg being called again in 5s that does the trick. doing it 10 times doesnt work.
+# Process streams
+schedule.every().day.at(process_time).do(
+  process_streams
+)
 
-
-
-#schedule.every().day.at(kill_time).do(
-#  kill_download_procs,
-#  procs
-#)
-
-## Process streams
-#schedule.every().day.at(process_time).do(
-#  process_streams
-#)
-#
-## Redownload streams
-#schedule.every().day.at(restart_download_time).do(
-#  start_download_procs,
-#  streamers,
-#  procs
-#)
+# Redownload streams
+schedule.every().day.at(restart_download_time).do(
+  start_download_procs,
+  streamers,
+  procs
+)
 
 while True:
   schedule.run_pending()
