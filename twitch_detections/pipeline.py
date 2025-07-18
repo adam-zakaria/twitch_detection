@@ -92,7 +92,6 @@ def process(stream_path=''):
         try:
             for stream_path in glob.glob(f'output/**/stream/*.mp4'):
                 utils.rm(stream_path)
-            print('Removed processed streams')
         except Exception as e:
             utils.wa('Error removing processed streams', 'log.txt')
             print(f'Error removing processed streams: {e}')

@@ -9,25 +9,8 @@ import path
 import glob
 
 """
-Instead of start and killing processes, just process videos which are after the time and remove the ones before. Or some other kind of file maintenance. Not sure this is really possible, because new streams would still need to be created...
+Need to troubleshoot a single stream something with the files being off.
 """
-"""
-Currently:
-
-* Exploring cases:
-  * A streamer is not streaming - if retry is configured, os.killpg does not work. But it does not need to work - the point of killing a download is so that the stream can be processed and redownloaded with another filename. 
-  * Restart works for a streamer streaming
-  * If there are two streamers streaming and one is live and one is not, it SEEMs like the WAIT of the not live will block the live processing. It's possible it's just the term that's blocked, and it's surprising because I'd think these are independent processes. Should have process write to files to confirm this is indeed getting blocked.
-
-  Weirdly though, the other streamers download is still working...
-
-  Yes confirmed, log.txt never gets written to.
-  * 
- 
-Logging would be nice.
-"""
-
-
 
 def start_download_procs(streamers, procs):
   # Start downloads
