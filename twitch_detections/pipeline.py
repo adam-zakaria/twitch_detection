@@ -92,6 +92,12 @@ def process(stream_path=''):
             utils.wa('Error during concatenation', 'log.txt')
             print(f'Error during concatenation: {e}')
 
+
+    except Exception as e:
+        utils.wa('Exception in process', 'log.txt')
+        print(f'Exception {e} in process')
+
+    finally:
         # Cleanup
         print('Removing processed streams')
         try:
@@ -100,12 +106,6 @@ def process(stream_path=''):
         except Exception as e:
             utils.wa('Error removing processed streams', 'log.txt')
             print(f'Error removing processed streams: {e}')
-
-    except Exception as e:
-        utils.wa('Exception in process', 'log.txt')
-        print(f'Exception {e} in process')
-
-    finally:
         print('---- Finishing process() ----')
 
 

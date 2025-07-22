@@ -8,10 +8,6 @@ import pipeline
 import path
 import glob
 
-"""
-Need to troubleshoot a single stream something with the files being off.
-"""
-
 def start_download_procs(streamers, procs):
   # Start downloads
   # clear out any old entries from process list
@@ -33,15 +29,19 @@ def kill_download_procs(procs):
   for proc in procs:
     os.killpg(proc.pid, signal.SIGINT)
     # os.killpg(proc.pid, signal.SIGKILL)
-    proc.wait() # Best practice to fully cleanup subprocess
+    # proc.wait() # Best practice to fully cleanup subprocess
 
 def process_streams():
   # start processing once the streams are killed.
+  print('process_streams()')
   for stream_path in glob.glob(f'output/**/stream/*.mp4'):
     pipeline.process(stream_path)
 
 # Start downloads now
-streamers = ['tigger_en'] 
+#streamers = ['pzzznguin','selfmademax','ubernick', 'formal'] 
+#streamers = ['pzzznguin', 'formal'] 
+#streamers = ['pzzznguin'] 
+streamers = ['hunter_jjx', 'formal'] 
 procs = []
 start_download_procs(streamers, procs)
 
