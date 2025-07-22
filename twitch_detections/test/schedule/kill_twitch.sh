@@ -1,0 +1,1 @@
+ps aux | grep '[t]witch.tv' | awk '{print $2}' | xargs kill -9
