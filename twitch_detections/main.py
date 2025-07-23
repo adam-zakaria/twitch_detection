@@ -5,8 +5,12 @@ import subprocess
 import time
 import happy_utils as utils
 import pipeline
-import path
 import glob
+import atexit
+import signal
+import subprocess
+import sys
+
 
 def start_download_procs(streamers, procs):
   # Start downloads
@@ -32,25 +36,27 @@ def kill_download_procs(procs):
     # proc.wait() # Best practice to fully cleanup subprocess
 
 def process_streams():
-  # start processing once the streams are killed.
+  # start processing once the streams are killed
   print('process_streams()')
+  # process
   for stream_path in glob.glob(f'output/**/stream/*.mp4'):
     pipeline.process(stream_path)
+  # remove processed streams
+  for stream_path in glob.glob(f'output/**/stream/*.mp4'):
+      utils.rm(stream_path)
 
 # Start downloads now
-#streamers = ['pzzznguin','selfmademax','ubernick', 'formal'] 
-#streamers = ['pzzznguin', 'formal'] 
-#streamers = ['pzzznguin'] 
-streamers = ['hunter_jjx', 'formal'] 
+#streamers = ['hunter_jjx', 'vsweetheart', 'perkushon', 'formal'] 
+streamers = ['vincesega', 'Pandas_POV', 'Aldonaitorr', 'luciid_tw'] 
 procs = []
 start_download_procs(streamers, procs)
 
 # generate times for testing
 from datetime import datetime, timedelta
 now = datetime.now()
-kill_time = (now + timedelta(minutes=1)).strftime("%H:%M")
-process_time = (now + timedelta(minutes=2)).strftime("%H:%M")
-restart_download_time = (now + timedelta(minutes=3)).strftime("%H:%M")
+kill_time = (now + timedelta(seconds=60)).strftime("%H:%M:%S")
+process_time = (now + timedelta(seconds=90)).strftime("%H:%M:%S") # kill_time + 1
+restart_download_time = (now + timedelta(seconds=120)).strftime("%H:%M:%S") # process_time + 1
 
 schedule.every().day.at(kill_time).do(
   kill_download_procs,
@@ -63,11 +69,22 @@ schedule.every().day.at(process_time).do(
 )
 
 # Redownload streams
-schedule.every().day.at(restart_download_time).do(
-  start_download_procs,
-  streamers,
-  procs
-)
+#schedule.every().day.at(restart_download_time).do(
+#  start_download_procs,
+#  streamers,
+#  procs
+#)
+
+def cleanup():
+    print('[CLEANUP] Killing twitch.tv downloads...')
+    subprocess.run("ps aux | grep '[t]witch.tv' | awk '{print $2}' | xargs kill -9", shell=True)
+
+# Register cleanup on normal exit
+atexit.register(cleanup)
+
+# Catch signals like Ctrl+C and kill
+signal.signal(signal.SIGINT, lambda s, f: sys.exit(1))   # Ctrl+C
+signal.signal(signal.SIGTERM, lambda s, f: sys.exit(1))  # kill or shutdown
 
 while True:
   schedule.run_pending()

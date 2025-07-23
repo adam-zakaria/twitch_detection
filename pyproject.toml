@@ -15,6 +15,7 @@ torch = "^2.7.1"
 torchvision = "^0.22.1"
 schedule = "^1.2.2"
 path = "^17.1.0"
+ipdb = "^0.13.13"
 
 
 [build-system]
