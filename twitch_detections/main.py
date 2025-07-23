@@ -69,11 +69,11 @@ schedule.every().day.at(process_time).do(
 )
 
 # Redownload streams
-#schedule.every().day.at(restart_download_time).do(
-#  start_download_procs,
-#  streamers,
-#  procs
-#)
+schedule.every().day.at(restart_download_time).do(
+  start_download_procs,
+  streamers,
+  procs
+)
 
 def cleanup():
     print('[CLEANUP] Killing twitch.tv downloads...')

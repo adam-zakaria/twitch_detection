@@ -12,7 +12,7 @@ or
 
 # Run
 `poetry shell`
-`pm2 start 'python subprocesses.py' --name 'subprocesses'`
+`pm2 start 'python -u main.py' --name 'twitch'`
 
 # Add packages to project
 poetry add <packages>

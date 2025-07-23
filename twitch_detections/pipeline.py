@@ -62,6 +62,10 @@ def process(stream_path=''):
                 # If not 1080p crop will complain (but maybe be fine)
                 print("Not 1080p...skipping")
                 return
+        # Failed to get resolution
+        else:
+            print("Failed to get resolution...skipping")
+            return
 
         # Reframe
         print('Reframing video to an ROI')
