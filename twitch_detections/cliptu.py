@@ -233,7 +233,7 @@ def filter_timestamps(timestamps):
       filtered_timestamps.append(value)
   return filtered_timestamps
 
-def reframe_video_mem(input_path='', x=0, y=0, w=0, h=0, every_nth_frame=None):
+def crop(input_path='', x=0, y=0, w=0, h=0, every_nth_frame=None):
     """
     Crop a video to a fixed ROI.
     input_path: path to the input video
@@ -247,10 +247,8 @@ def reframe_video_mem(input_path='', x=0, y=0, w=0, h=0, every_nth_frame=None):
     timestamps_crops = []
     for idx, (ts,frame) in enumerate(get_frames(input_path, yield_timestamps=True, every_nth_frame=every_nth_frame)):
         crop = frame[y:y+h, x:x+w]
-        timestamps_crops.append((ts, crop))
-
-    # return timestamps and crops
-    return timestamps_crops
+        yield(ts,crop)
+        #timestamps_crops.append((ts, crop))
 
 def template_match_folder(timestamps_and_frames=[], output_folder_path='', template_image_path='', log_file_path='', threshold=.8):
     """

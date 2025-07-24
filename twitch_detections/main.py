@@ -4,7 +4,7 @@ import signal
 import subprocess
 import time
 import happy_utils as utils
-import pipeline
+import twitch_detections.process as process
 import glob
 import atexit
 import signal
@@ -40,23 +40,23 @@ def process_streams():
   print('process_streams()')
   # process
   for stream_path in glob.glob(f'output/**/stream/*.mp4'):
-    pipeline.process(stream_path)
+    process.process(stream_path)
   # remove processed streams
   for stream_path in glob.glob(f'output/**/stream/*.mp4'):
       utils.rm(stream_path)
 
 # Start downloads now
-#streamers = ['hunter_jjx', 'vsweetheart', 'perkushon', 'formal'] 
-streamers = ['vincesega', 'Pandas_POV', 'Aldonaitorr', 'luciid_tw'] 
+#streamers = ['hunter_jjx', 'perkushon', 'ubernick', 'formal'] 
+streamers = ['extremebreaker1', 'hunter_jjx', 'Luciid_tw', 'selfmademax'] 
 procs = []
 start_download_procs(streamers, procs)
 
 # generate times for testing
 from datetime import datetime, timedelta
 now = datetime.now()
-kill_time = (now + timedelta(seconds=60)).strftime("%H:%M:%S")
-process_time = (now + timedelta(seconds=90)).strftime("%H:%M:%S") # kill_time + 1
-restart_download_time = (now + timedelta(seconds=120)).strftime("%H:%M:%S") # process_time + 1
+kill_time = (now + timedelta(minutes=3)).strftime("%H:%M:%S")
+process_time = (now + timedelta(minutes=4)).strftime("%H:%M:%S") # kill_time + 1
+restart_download_time = (now + timedelta(minutes=5)).strftime("%H:%M:%S") # process_time + 1
 
 schedule.every().day.at(kill_time).do(
   kill_download_procs,
