@@ -273,12 +273,16 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
 
     # go through each frame looking for a double kill (template match each frame)
     match_timestamps = []
+
+    # initialize tempate image path and load template image
+    template_image_path = Path(template_image_path)
+    template_image = cv2.imread(str(template_image_path))
+
+    # iterate through frames and perform template matching
     for i, (ts, frame) in enumerate(timestamps_and_frames):
         
-        # initialize image paths and load template image
+        # initialize output image path
         OUTPUT_IMAGE_PATH  = f'{output_folder_path}/{ts}.png'
-        template_image_path = Path(template_image_path)
-        template_image = cv2.imread(str(template_image_path))
 
         # Perform template matching
         result = cv2.matchTemplate(frame, template_image, cv2.TM_CCOEFF_NORMED)
@@ -341,7 +345,7 @@ def extract(timestamps, video_path):
   for ts in timestamps:
     os.system(f"ffmpeg -i {video_path} -ss {ts} -t 3 -c copy {ts}.mp4")
 
-def concat(input_file_paths, output_file="output.mp4"):
+def concat(input_file_paths, output_file_path="output.mp4"):
   if not input_file_paths:
     raise ValueError("No input files provided.")
 
@@ -366,7 +370,7 @@ def concat(input_file_paths, output_file="output.mp4"):
   ffmpeg_cmd.extend([
     "-filter_complex", filter_complex,
     "-map", "[outv]", "-map", "[outa]",
-    output_file
+    output_file_path
   ])
 
   # Print the command for debugging
@@ -375,7 +379,7 @@ def concat(input_file_paths, output_file="output.mp4"):
   # Execute the command
   subprocess.run(ffmpeg_cmd, check=True)
 
-  return output_file
+  return output_file_path
 
 def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=False):
     """
@@ -609,3 +613,46 @@ def extract_clips(diarization,input_video, output_folder):
     output_clip_path = f'{output_folder}/{i}.mp4'
     extract_clip(input_video, seg['start'], seg['end'], output_clip_path)
   return output_folder
+
+def get_video_resolution(stream_path):
+    """
+    Returns (width, height) of the video at stream_path using ffprobe.
+    Returns None if resolution can't be determined.
+
+    Example:
+
+    # Check resolution
+    # res = get_video_resolution(stream_path)
+    # if res:
+    #     print(f"Resolution: {res[0]}x{res[1]}")
+    #     if res == (1920, 1080):
+    #         print("Stream is 1080p. Continuing")
+    #     else:
+    #         # If not 1080p crop will complain (but maybe be fine)
+    #         print("Not 1080p...skipping")
+    #         return
+    # # Failed to get resolution
+    # else:
+    #     print("Failed to get resolution...skipping")
+    #     return
+    """
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe",
+                "-v", "error",
+                "-select_streams", "v:0",
+                "-show_entries", "stream=width,height",
+                "-of", "csv=p=0",
+                stream_path
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+        width, height = map(int, result.stdout.strip().split(','))
+        return width, height
+    except Exception as e:
+        print(f"Failed to get resolution for {stream_path}: {e}")
+        return None

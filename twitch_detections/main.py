@@ -4,7 +4,7 @@ import signal
 import subprocess
 import time
 import happy_utils as utils
-import twitch_detections.process as process
+import process as process
 import glob
 import atexit
 import signal

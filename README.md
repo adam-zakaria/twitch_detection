@@ -24,3 +24,11 @@ The job start time can b inferred fom the file naem, the time is in the filename
 
 1157, so the job processing should start at 1257.
 if the pm2 logs could be cleared for each start that could be good.
+
+New log proposal
+
+-----------------------
+{streamer}
+Found 3 matches
+Extracting clips to {}
+Outputting compilation to {}
