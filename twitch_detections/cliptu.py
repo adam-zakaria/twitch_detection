@@ -229,7 +229,7 @@ def filter_timestamps(timestamps):
   """
   filtered_timestamps = []
   for i, value in enumerate(timestamps):  # Convert values to floats
-    if i == 0 or (value - filtered_timestamps[-1] >= 1.0):
+    if i == 0 or (value - filtered_timestamps[-1] >= 3.0):
       filtered_timestamps.append(value)
   return filtered_timestamps
 
