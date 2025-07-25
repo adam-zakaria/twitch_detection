@@ -1,10 +1,14 @@
+"""
+Imports
+"""
+
 import schedule
 import os
 import signal
 import subprocess
 import time
 import happy_utils as utils
-import process as process
+import process_stream
 import glob
 import atexit
 import signal
@@ -12,6 +16,10 @@ import subprocess
 import sys
 import config
 from datetime import datetime, timedelta
+
+"""
+Function which enable cliptu to download halo twitch streams 24/7 and create double kill compilations
+"""
 
 def start_downloads(streamers, processes):
   # Start downloads
@@ -41,7 +49,7 @@ def process_streams():
   print('process_streams()')
   # process
   for stream_path in glob.glob(f'output/**/stream/*.mp4'):
-    process.process(stream_path)
+    process_stream.process_stream(stream_path)
   # remove processed streams
   try:
     for stream_path in glob.glob(f'output/**/stream/*.mp4'):
