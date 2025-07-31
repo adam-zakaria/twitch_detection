@@ -163,6 +163,34 @@ def ffprobe(video_file, output_file=""):
      w(filtered_lines, output_file)
   print(filtered_lines)
 
+def get_video_length(path):
+    """
+    Returns the duration of a video in seconds (float).
+    
+    Requires ffprobe (part of ffmpeg) to be installed and on PATH.
+    """
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe",
+                "-v", "error",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                path
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True
+        )
+        return float(result.stdout.strip())
+    except subprocess.CalledProcessError as e:
+        print("ffprobe failed:", e.stderr.decode())
+        raise
+    except ValueError:
+        print("Failed to parse duration")
+        raise
+
+
 def extract_all(input_path, output_path):
     # Create output directory if missing
     os.makedirs(output_path, exist_ok=True)
@@ -250,7 +278,7 @@ def crop(input_path='', x=0, y=0, w=0, h=0, every_nth_frame=None):
         yield(ts,crop)
         #timestamps_crops.append((ts, crop))
 
-def template_match_folder(timestamps_and_frames=[], output_folder_path='', template_image_path='', log_file_path='', threshold=.8):
+def template_match_folder(timestamps_and_frames=[], output_folder_path='', template_image_path='', log_file_path='', threshold=.8, verbose=False):
     """
     Template match each frame in the folder
     timestamps_and_frames: list of tuples (timestamp, frame)
@@ -278,8 +306,13 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
     template_image_path = Path(template_image_path)
     template_image = cv2.imread(str(template_image_path))
 
+    # initialize log_str
+    log_str = ''
+
     # iterate through frames and perform template matching
     for i, (ts, frame) in enumerate(timestamps_and_frames):
+        # print the current frame
+        print(f"\rProcessing frame {i}", end="")
         
         # initialize output image path
         OUTPUT_IMAGE_PATH  = f'{output_folder_path}/{ts}.png'
@@ -289,10 +322,11 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
         # log the output image path and confidence score
-        log_str = f"Output Image path: {OUTPUT_IMAGE_PATH}\n"
-        log_str += f"Confidence score: {max_val:.4f}\n"
-        log_str += f"--------------------------------\n"
-        log_strs += log_str
+        if verbose:
+            log_str += f"Output Image path: {OUTPUT_IMAGE_PATH}\n"
+            log_str += f"Confidence score: {max_val:.4f}\n"
+            log_str += f"--------------------------------\n"
+            log_strs += log_str
 
         # Draw a rectangle around the matched region
         h, w = template_image.shape[:2]
@@ -302,12 +336,12 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
 
         # Save and display the result
         if max_val >= threshold:
-            print(f"Template match found at {ts} with confidence {max_val:.4f}")
+            log_strs += f"Template match found at {ts} with confidence {max_val:.4f}\n"
             cv2.imwrite(OUTPUT_IMAGE_PATH, frame)
             match_timestamps.append(ts)
 
     # write log and return match timestamps
-    utils.w(log_strs, log_path)
+    utils.wa(log_strs, log_path)
     return match_timestamps
 
 def every_nth_frame(input_path, nth_frame):
@@ -374,14 +408,14 @@ def concat(input_file_paths, output_file_path="output.mp4"):
   ])
 
   # Print the command for debugging
-  print("Running command:", " ".join(ffmpeg_cmd))
+  print(" ".join(ffmpeg_cmd))
 
   # Execute the command
   subprocess.run(ffmpeg_cmd, check=True)
 
   return output_file_path
 
-def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=False):
+def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=False, verbose = False, log_file=None):
     """
     Extracts a clip from a video using ffmpeg with optional start and end times.
 
@@ -415,9 +449,12 @@ def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=Fa
     cmd += f" -c copy {output_path}"
     
     # Print the command and execute it
-    print('----------------------------------')
-    print(cmd)
-    print('----------------------------------')
+    if verbose:
+        print(cmd)
+    
+    # Output to log if log
+    if log_file:
+        utils.wa(cmd, log_file)
 
     # execute the command
     os.system(cmd)

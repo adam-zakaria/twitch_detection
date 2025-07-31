@@ -10,8 +10,20 @@ from pathlib import Path
 import happy_utils as utils
 import time
 import glob
-
 import subprocess
+import config
+
+def process_streams():
+  # start processing once the streams are killed
+  # process
+  for stream_path in glob.glob(f'output/**/stream/*.mp4'):
+    process_stream.process_stream(stream_path)
+  # remove processed streams
+  try:
+    for stream_path in glob.glob(f'output/**/stream/*.mp4'):
+        utils.rm(stream_path)
+  except:
+    pass
 
 def process_stream(stream_path=''):
     """
@@ -22,7 +34,11 @@ def process_stream(stream_path=''):
     """
     try:
         # welcome print
-        print(f'starting process() on {stream_path}')
+        print(f'Starting process() on {stream_path}')
+        print(f'The stream is {cliptu.get_video_length(stream_path)} seconds long')
+
+        # start timer
+        process_stream_start_time = time.time()
 
         # Initialize paths
         # Might want to convert this to use Paths instead of opj and splits
@@ -46,7 +62,7 @@ def process_stream(stream_path=''):
                 timestamps_and_frames=timestamps_and_frames_generator,
                 output_folder_path='./template_match',
                 template_image_path=template_path,
-                log_file_path='./template_match_log.txt',
+                log_file_path=config.log_file_path,
                 threshold=0.8
             )
             end_time = time.time()
@@ -56,7 +72,7 @@ def process_stream(stream_path=''):
               print('\tno matches found, exiting process()')
               return
         except Exception as e:
-            utils.wa('Error during template matching', 'log.txt')
+            utils.wa('Error during template matching', config.log_file_path)
             print(f'Error during template matching: {e}')
 
         # Filter timestamps
@@ -64,7 +80,7 @@ def process_stream(stream_path=''):
         try:
             filtered_timestamps = cliptu.filter_timestamps(match_timestamps)
         except Exception as e:
-            utils.wa('Error filtering timestamps', 'log.txt')
+            utils.wa('Error filtering timestamps', config.log_file_path)
             print(f'Error filtering timestamps: {e}')
 
         # Extract clips
@@ -72,13 +88,10 @@ def process_stream(stream_path=''):
         paths = []
         try:
             for timestamp in filtered_timestamps:
-                path = cliptu.extract_clip(
-                    stream_path, utils.opj(clips_dir, f'{timestamp}.mp4'),
-                    timestamp - 8, timestamp + 3
-                )
+                path = cliptu.extract_clip(stream_path, utils.opj(clips_dir, f'{timestamp}.mp4'), timestamp - 8, timestamp + 3, log_file_path = config.log_file_path)
                 paths.append(path)
         except Exception as e:
-            utils.wa('Error during clip extraction', 'log.txt')
+            utils.wa('Error during clip extraction', config.log_file_path)
             print(f'Error during clip extraction: {e}')
 
         # Concatenate clips (for single streamer, need to do an additional concat for all streamers)
@@ -87,11 +100,11 @@ def process_stream(stream_path=''):
             cliptu.concat(paths, output_file_path=compilation_path)
             print(f'Concatenated {len(paths)} clips to {compilation_path}')
         except Exception as e:
-            utils.wa('Error during concatenation', 'log.txt')
+            utils.wa('Error during concatenation', config.log_file_path)
             print(f'Error during concatenation: {e}')
 
     except Exception as e:
-        utils.wa('Exception in process', 'log.txt')
+        utils.wa('Exception in process', config.log_file_path)
         print(f'Exception {e} in process')
 
     finally:
@@ -100,5 +113,7 @@ def process_stream(stream_path=''):
         try:
             utils.rm(stream_path)
         except Exception as e:
-            #utils.wa('Error removing processed streams', 'log.txt')
+            #utils.wa('Error removing processed streams', config.log_file_path)
             print(f'Error removing processed streams: {e}')
+        process_stream_end_time = time.time()
+        print(f'\ttook {process_stream_end_time - process_stream_start_time:.2f} seconds')

@@ -1,3 +1,4 @@
+import happy_utils as utils
 # config.py
 
 # Streamers to track
@@ -11,3 +12,5 @@ streamers = [
 kill_time = 180
 process_time = 182
 restart_download_time = 185
+
+log_file_path = f'log/log_{utils.ts()}.txt'
