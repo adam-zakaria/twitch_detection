@@ -6,9 +6,8 @@ authors = ["Adam Zakaria <adam.p.zakaria@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.13"
 yt-dlp = "^2025.6.25"
-happy-utils = "^0.1.2"
 onnx = "^1.18.0"
 onnxruntime = "^1.22.0"
 torch = "^2.7.1"
@@ -16,7 +15,6 @@ torchvision = "^0.22.1"
 schedule = "^1.2.2"
 path = "^17.1.0"
 ipdb = "^0.13.13"
-
 
 [build-system]
 requires = ["poetry-core"]

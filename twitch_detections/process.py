@@ -13,17 +13,17 @@ import glob
 import subprocess
 import config
 
-def process_streams():
-  # start processing once the streams are killed
-  # process
-  for stream_path in glob.glob(f'output/**/stream/*.mp4'):
-    process_stream.process_stream(stream_path)
-  # remove processed streams
-  try:
-    for stream_path in glob.glob(f'output/**/stream/*.mp4'):
-        utils.rm(stream_path)
-  except:
-    pass
+def hms(seconds):
+    parts = []
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+
+    if hours: parts.append(f"{hours} hours")
+    if minutes: parts.append(f"{minutes} minutes")
+    if secs or not parts: parts.append(f"{secs} seconds")
+
+    return " ".join(parts)
 
 def process_stream(stream_path=''):
     """
@@ -33,12 +33,12 @@ def process_stream(stream_path=''):
     * Concatenate the clips
     """
     try:
-        # welcome print
-        print(f'Starting process() on {stream_path}')
-        print(f'The stream is {cliptu.get_video_length(stream_path)} seconds long')
-
-        # start timer
+        # start benchmark for process_stream()
         process_stream_start_time = time.time()
+
+        # welcome print
+        print(f'Starting process() at {utils.ts()} on {stream_path}')
+        print(f'The stream is {hms(cliptu.get_video_length(stream_path))}')
 
         # Initialize paths
         # Might want to convert this to use Paths instead of opj and splits
@@ -66,7 +66,7 @@ def process_stream(stream_path=''):
                 threshold=0.8
             )
             end_time = time.time()
-            print(f'\ttook {end_time - start_time:.2f} seconds')
+            print(f'\ttook {hms(end_time - start_time)}')
             # Check for detections
             if match_timestamps == []:
               print('\tno matches found, exiting process()')
@@ -74,6 +74,8 @@ def process_stream(stream_path=''):
         except Exception as e:
             utils.wa('Error during template matching', config.log_file_path)
             print(f'Error during template matching: {e}')
+            print(f'Returning from process()')
+            return
 
         # Filter timestamps
         print('Filtering timestamps')
@@ -82,6 +84,8 @@ def process_stream(stream_path=''):
         except Exception as e:
             utils.wa('Error filtering timestamps', config.log_file_path)
             print(f'Error filtering timestamps: {e}')
+            print(f'Returning from process()')
+            return
 
         # Extract clips
         print('Extracting clips')
@@ -93,15 +97,20 @@ def process_stream(stream_path=''):
         except Exception as e:
             utils.wa('Error during clip extraction', config.log_file_path)
             print(f'Error during clip extraction: {e}')
+            print(f'Returning from process()')
+            return
 
+        # ***** SKIP CONCATENATION FOR NOW BECAUSE OF CRASHES *****
         # Concatenate clips (for single streamer, need to do an additional concat for all streamers)
-        print('Concatenating clips')
-        try:
-            cliptu.concat(paths, output_file_path=compilation_path)
-            print(f'Concatenated {len(paths)} clips to {compilation_path}')
-        except Exception as e:
-            utils.wa('Error during concatenation', config.log_file_path)
-            print(f'Error during concatenation: {e}')
+        # print('Concatenating clips')
+        # try:
+        #     cliptu.concat(paths, output_file_path=compilation_path, log_file_path=config.log_file_path)
+        #     print(f'Concatenated {len(paths)} clips to {compilation_path}')
+        # except Exception as e:
+        #     utils.wa('Error during concatenation', config.log_file_path)
+        #     print(f'Error during concatenation: {e}')
+        #     print(f'Returning from process()')
+        #     return
 
     except Exception as e:
         utils.wa('Exception in process', config.log_file_path)
@@ -113,7 +122,23 @@ def process_stream(stream_path=''):
         try:
             utils.rm(stream_path)
         except Exception as e:
-            #utils.wa('Error removing processed streams', config.log_file_path)
             print(f'Error removing processed streams: {e}')
         process_stream_end_time = time.time()
-        print(f'\ttook {process_stream_end_time - process_stream_start_time:.2f} seconds')
+        print(f'process() took {hms(process_stream_end_time - process_stream_start_time)}')
+        return
+
+def process_streams():
+  # start processing once the streams are killed
+  
+  # remove all temp streams (not sure why they're still created)
+  temp_stream_paths = glob.glob(f'output/**/stream/*.temp.mp4', recursive = True) # ** matches ONE directory, otherwise recursive = True is needed
+  for temp_stream_path in temp_stream_paths:
+    print(f'Removing {temp_stream_path} ({hms(cliptu.get_video_length(temp_stream_path))})')
+    utils.rm(temp_stream_path)
+
+  # get all downloaded stream paths (mp4s)
+  stream_paths = glob.glob(f'output/**/stream/*.mp4', recursive = True)
+  # process all streams
+  print(f'Starting process_streams() on {stream_paths}')
+  for stream_path in stream_paths:
+    process_stream(stream_path)

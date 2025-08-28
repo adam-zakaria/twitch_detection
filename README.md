@@ -11,25 +11,92 @@ or
 
 # Run
 `poetry shell`
-`pm2 start 'python -u main.py' --name 'twitch'`
+`pm2 start 'python -u schedule_events.py' --name 'twitch'`
 
 # Add packages to project
 poetry add <packages>
 
+# venv
+## Create venv
+ubuntu@ip-172-31-46-149:~/Code/twitch_detections/twitch_detections$ `poetry env activate`
+Creating virtualenv twitch-detections-0p2BiuAg-py3.13 in /home/ubuntu/.cache/pypoetry/virtualenvs
+source /home/ubuntu/.cache/pypoetry/virtualenvs/twitch-detections-0p2BiuAg-py3.13/bin/activate
+# activate it
+ubuntu@ip-172-31-46-149:~/Code/twitch_detections/twitch_detections$ `source /home/ubuntu/.cache/pypoetry/virtualenvs/twitch-detections-0p2BiuAg-py3.13/bin/activate`
+
 # Additional commands
 `pm2 flush`
+`tail -n 100000 /home/ubuntu/.pm2/logs/twitch-out.log`
+3.13.2 is not installed and happy-utils is not installed.
+Why?
+Also the pm2 logs 0 --lines 100000 behavior is weird. It's not less, so I can't gg to the top, I also can't scroll to the top. And there's just those tons of 'The channel is not currently live'.
 
-# Thoughts / Improvements
-## New log proposal
------------------------
-{streamer}
-Found 3 matches
-Extracting clips to {}
-Outputting compilation to {}
+So obviously the python version needs to be resolved, but wasn't this already working with the fluff0132 test?
 
-## Concat issue
-Not sure why but it got a sigkill, maybe from main.py? Not sure...
+A lot of streams got downloaded. Do we want to just delete the streams?
 
-Concatenating clips
-Running command: ffmpeg -y -hide_banner -loglevel error -nostats -i output/Tripppey/clips/161.00008944692908.mp4 -i output/Tripppey/clips/162.0000900025001.mp4 -i output/Tripppey/clips/210.0001166699075.mp4 -i output/Tripppey/clips/297.0001650045835.mp4 -i output/Tripppey/clips/298.00016556015447.mp4 -i output/Tripppey/clips/305.0001694491514.mp4 -i output/Tripppey/clips/306.00017000472235.mp4 -i output/Tripppey/clips/329.0001827828551.mp4 -i output/Tripppey/clips/330.0001833384261.mp4 -i output/Tripppey/clips/331.0001838939971.mp4 -i output/Tripppey/clips/347.0001927831329.mp4 -i output/Tripppey/clips/348.00019333870387.mp4 -i output/Tripppey/clips/359.00019944998473.mp4 -i output/Tripppey/clips/394.00021889496935.mp4 -i output/Tripppey/clips/395.0002194505403.mp4 -i output/Tripppey/clips/396.0002200061113.mp4 -i output/Tripppey/clips/444.00024667351875.mp4 -i output/Tripppey/clips/445.0002472290897.mp4 -i output/Tripppey/clips/454.00025222922864.mp4 -i output/Tripppey/clips/455.0002527847996.mp4 -i output/Tripppey/clips/456.0002533403706.mp4 -i output/Tripppey/clips/467.00025945165146.mp4 -i output/Tripppey/clips/468.00026000722244.mp4 -i output/Tripppey/clips/494.00027445206814.mp4 -i output/Tripppey/clips/495.0002750076391.mp4 -i output/Tripppey/clips/496.0002755632101.mp4 -i output/Tripppey/clips/504.00028000777803.mp4 -i output/Tripppey/clips/505.000280563349.mp4 -i output/Tripppey/clips/515.0002861190588.mp4 -i output/Tripppey/clips/516.0002866746299.mp4 -i output/Tripppey/clips/517.0002872302009.mp4 -i output/Tripppey/clips/540.0003000083336.mp4 -i output/Tripppey/clips/541.0003005639046.mp4 -i output/Tripppey/clips/577.0003205644601.mp4 -i output/Tripppey/clips/578.0003211200311.mp4 -i output/Tripppey/clips/583.0003238978861.mp4 -i output/Tripppey/clips/584.0003244534571.mp4 -filter_complex [0:v:0][0:a:0][1:v:0][1:a:0][2:v:0][2:a:0][3:v:0][3:a:0][4:v:0][4:a:0][5:v:0][5:a:0][6:v:0][6:a:0][7:v:0][7:a:0][8:v:0][8:a:0][9:v:0][9:a:0][10:v:0][10:a:0][11:v:0][11:a:0][12:v:0][12:a:0][13:v:0][13:a:0][14:v:0][14:a:0][15:v:0][15:a:0][16:v:0][16:a:0][17:v:0][17:a:0][18:v:0][18:a:0][19:v:0][19:a:0][20:v:0][20:a:0][21:v:0][21:a:0][22:v:0][22:a:0][23:v:0][23:a:0][24:v:0][24:a:0][25:v:0][25:a:0][26:v:0][26:a:0][27:v:0][27:a:0][28:v:0][28:a:0][29:v:0][29:a:0][30:v:0][30:a:0][31:v:0][31:a:0][32:v:0][32:a:0][33:v:0][33:a:0][34:v:0][34:a:0][35:v:0][35:a:0][36:v:0][36:a:0]concat=n=37:v=1:a=1[outv][outa] -map [outv] -map [outa] output/Tripppey/compilation/07_24_2025_16_24_13.mp4
-Error during concatenation: Command '['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-nostats', '-i', 'output/Tripppey/clips/161.00008944692908.mp4', '-i', 'output/Tripppey/clips/162.0000900025001.mp4', '-i', 'output/Tripppey/clips/210.0001166699075.mp4', '-i', 'output/Tripppey/clips/297.0001650045835.mp4', '-i', 'output/Tripppey/clips/298.00016556015447.mp4', '-i', 'output/Tripppey/clips/305.0001694491514.mp4', '-i', 'output/Tripppey/clips/306.00017000472235.mp4', '-i', 'output/Tripppey/clips/329.0001827828551.mp4', '-i', 'output/Tripppey/clips/330.0001833384261.mp4', '-i', 'output/Tripppey/clips/331.0001838939971.mp4', '-i', 'output/Tripppey/clips/347.0001927831329.mp4', '-i', 'output/Tripppey/clips/348.00019333870387.mp4', '-i', 'output/Tripppey/clips/359.00019944998473.mp4', '-i', 'output/Tripppey/clips/394.00021889496935.mp4', '-i', 'output/Tripppey/clips/395.0002194505403.mp4', '-i', 'output/Tripppey/clips/396.0002200061113.mp4', '-i', 'output/Tripppey/clips/444.00024667351875.mp4', '-i', 'output/Tripppey/clips/445.0002472290897.mp4', '-i', 'output/Tripppey/clips/454.00025222922864.mp4', '-i', 'output/Tripppey/clips/455.0002527847996.mp4', '-i', 'output/Tripppey/clips/456.0002533403706.mp4', '-i', 'output/Tripppey/clips/467.00025945165146.mp4', '-i', 'output/Tripppey/clips/468.00026000722244.mp4', '-i', 'output/Tripppey/clips/494.00027445206814.mp4', '-i', 'output/Tripppey/clips/495.0002750076391.mp4', '-i', 'output/Tripppey/clips/496.0002755632101.mp4', '-i', 'output/Tripppey/clips/504.00028000777803.mp4', '-i', 'output/Tripppey/clips/505.000280563349.mp4', '-i', 'output/Tripppey/clips/515.0002861190588.mp4', '-i', 'output/Tripppey/clips/516.0002866746299.mp4', '-i', 'output/Tripppey/clips/517.0002872302009.mp4', '-i', 'output/Tripppey/clips/540.0003000083336.mp4', '-i', 'output/Tripppey/clips/541.0003005639046.mp4', '-i', 'output/Tripppey/clips/577.0003205644601.mp4', '-i', 'output/Tripppey/clips/578.0003211200311.mp4', '-i', 'output/Tripppey/clips/583.0003238978861.mp4', '-i', 'output/Tripppey/clips/584.0003244534571.mp4', '-filter_complex', '[0:v:0][0:a:0][1:v:0][1:a:0][2:v:0][2:a:0][3:v:0][3:a:0][4:v:0][4:a:0][5:v:0][5:a:0][6:v:0][6:a:0][7:v:0][7:a:0][8:v:0][8:a:0][9:v:0][9:a:0][10:v:0][10:a:0][11:v:0][11:a:0][12:v:0][12:a:0][13:v:0][13:a:0][14:v:0][14:a:0][15:v:0][15:a:0][16:v:0][16:a:0][17:v:0][17:a:0][18:v:0][18:a:0][19:v:0][19:a:0][20:v:0][20:a:0][21:v:0][21:a:0][22:v:0][22:a:0][23:v:0][23:a:0][24:v:0][24:a:0][25:v:0][25:a:0][26:v:0][26:a:0][27:v:0][27:a:0][28:v:0][28:a:0][29:v:0][29:a:0][30:v:0][30:a:0][31:v:0][31:a:0][32:v:0][32:a:0][33:v:0][33:a:0][34:v:0][34:a:0][35:v:0][35:a:0][36:v:0][36:a:0]concat=n=37:v=1:a=1[outv][outa]', '-map', '[outv]', '-map', '[outa]', 'output/Tripppey/compilation/07_24_2025_16_24_13.mp4']' died with <Signals.SIGKILL: 9>.
+
+# Current issue 8/27/25
+
+Okay, so the typical logs not getting output to /home/ubuntu/.pm2/logs/twitch-out.log also it seems a package 
+
+pm2 start 'python pipeline_pieces.py' --name 'twitch_process'
+
+Okay, so something deleted the streams. Keeping the streams around isn't expensive, so maybe we can do that for a bit and manually delete them? 
+
+And what about shorter runs? And also what about this just going a lot faster? 1080p is nothing to scoff at though, But maybe there's a way to do this.
+
+# Current issue:
+* ffprobe failed: [mov,mp4,m4a,3gp,3g2,mj2 @ 0xb63cb32e5a40] moov atom not found
+output/spartanthedogg/stream/spartanthedogg_08_20_2025_14_43_55.temp.mp4: Invalid data found when processing input
+
+
+# Current
+* Add timestamp to top of log
+* Investigate .temp.mp4? 
+* Do math on a long run - i.e. if
+  The stream is 3601.016667 seconds long
+  Template matching each frame
+          took 1691.42 seconds
+  Will this work for a long run.
+
+* The logging on pm2 is not great - it's not easy to tell separate the current run from previous ones. Cannot get specifically stdout and stderr for specific processes. 
+
+# Output results
+* Snakebite compilation did not work, clips did
+* manny_hcs, royal2, sparty, clips, compilation, deleted stream
+* envor3, barcode all folders created, nothing in them
+* tripppey, trunks, hunter_jjx, miniberzerker, stream/<stream>.mp4, nothing else
+
+## Logs Reflections
+So for all of the streamers mentioned above the streams were downloaded, so something must have prevented their processing.
+Envore - hour long stream nothing detected.
+
+Error during sparty concatenation
+
+barcode 4 hour stream with no matches. 
+Envore almost 3 hour with no matches.
+Fishy but not much to do...
+
+Concatenating clips snakebite is the last thing that got logged, so it's possible the program froze or something during this concatenation. Could skip concatenation step for now because there isn't enough memory for lots of clips with the current method. Then I'd guess for tripppey, trunks, hunter_jjx, miniberzerker they just didn't get run because of program crash or something.
+
+Okay so what am I think then...Don't do concatentation? Add multi kill support? Put these on s3? 
+
+Yes. Disable concatenation. Remove log ahead of time for easier parsing. Do tee another time. For next run confirm all streams get evaluated - they probably will given concatenation is disabled.
+
+
+## Logs
+Starting downloads at 08_14_2025_16_33_28
+
+output/spartanthedogg/stream/spartanthedogg_08_14_2025_16_33_29.temp.mp4: Invalid data found when processing input
+
+Starting process_streams() on ['output/manny_hcs/stream/manny_hcs_08_14_2025_22_38_30.mp4', 'output/royal2/stream/royal2_0
+8_14_2025_22_38_30.mp4', 'output/envor3/stream/envor3_08_14_2025_22_38_30.mp4', 'output/spartanthedogg/stream/spartanthedo
+gg_08_14_2025_22_38_30.mp4', 'output/barcode_ak/stream/barcode_ak_08_14_2025_22_38_30.mp4', 'output/snakebite/stream/snake
+bite_08_14_2025_22_38_29.mp4', 'output/minib3rzerker/stream/minib3rzerker_08_14_2025_22_38_29.mp4', 'output/Tripppey/strea
+m/Tripppey_08_14_2025_22_38_30.mp4']
+
+# To do
+* add triple kill, overkill, etc support. would that make it a lot longer...I think? Which would technically be fine...? And also could only check multi kills once a double kill shows up.
+* tempted to delete logs from last run - it's hard to parse the logs otherwise - though can look at date. Well....teeing logs to a timestamped file would probably be ideal.
+

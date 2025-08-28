@@ -1,16 +1,20 @@
 import happy_utils as utils
-# config.py
-
 # Streamers to track
+
 streamers = [
-    'wryce', 'snakebite','bound', 'lqgendd', 'formal', 'barcode_ak', 'Luciid_tw',
+    'minib3rzerker', 'hunter_jjx', 'trunks', 'wryce', 'snakebite','bound', 'lqgendd', 'formal', 'barcode_ak', 'Luciid_tw',
     'spartanthedogg', 'Tripppey', 'envor3', 'wutum',
-    'pzzznguin', 'manny_hcs', 'druk84', 'lastshot', 'royal2', 'frosty', 'cykul', 'scoobmeister'
+    'pzzznguin', 'manny_hcs', 'druk84', 'lastshot', 'royal2', 'frosty', 'cykul', 'scoobmeister', 'stresss', 'slg_']
+"""
+#streamers = ['illeydaone', 'pzzznguin', 'NapTimez', 'frosty']
+streamers = [
+    'fluff0132', 'luciid_tw'
 ]
+"""
 
 # Time offsets (in minutes)
-kill_time = 180
-process_time = 182
-restart_download_time = 185
+kill_time = 660
+process_time = 665 
+restart_download_time = 900
 
 log_file_path = f'log/log_{utils.ts()}.txt'

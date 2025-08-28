@@ -18,9 +18,17 @@ import config
 import download
 from datetime import datetime, timedelta
 
+def hms(seconds):
+  # Convert seconds to HH:MM:SS format
+  hours = seconds // 3600
+  minutes = (seconds % 3600) // 60
+  seconds = seconds % 60
+  return f"{hours}:{minutes}:{seconds}"
+
 def cleanup_on_exit():
   print('[CLEANUP] Killing twitch.tv downloads...')
   subprocess.run("ps aux | grep '[t]witch.tv' | awk '{print $2}' | xargs kill -9", shell=True)
+  subprocess.run("ps aux | grep '[f]fmpeg' | awk '{print $2}' | xargs kill -9", shell=True)
   for stream_path in glob.glob(f'output/**/stream/*.mp4'):
       utils.rm(stream_path)
 
@@ -46,8 +54,13 @@ if __name__ == "__main__":
   signal.signal(signal.SIGINT, lambda s, f: sys.exit(1))   # Ctrl+C
   signal.signal(signal.SIGTERM, lambda s, f: sys.exit(1))  # kill or shutdown
 
+  # Clear log files
+  utils.rm('/home/ubuntu/.pm2/logs/twitch-out.log')
+
   # Start downloads now
   processes = []
+  print(f'Starting downloads at {utils.ts()}')
+  print(f'Going to run process in {config.process_time} minutes')
   download.start_downloads(streamers, processes)
 
   # Schedule events to happen later
@@ -61,11 +74,11 @@ if __name__ == "__main__":
     process.process_streams
   )
   # Start downloads again
-  schedule.every().day.at(restart_download_time).do(
-    download.start_downloads,
-    streamers,
-    processes
-  )
+  # schedule.every().day.at(restart_download_time).do(
+  #   download.start_downloads,
+  #   streamers,
+  #   processes
+  # )
   # Infinite loop so schedule can fire events 
   while True:
     schedule.run_pending()

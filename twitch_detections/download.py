@@ -1,17 +1,9 @@
-import schedule
 import os
 import signal
 import subprocess
-import time
 import happy_utils as utils
-import process_stream
-import glob
-import atexit
 import signal
 import subprocess
-import sys
-import config
-from datetime import datetime, timedelta
 
 def start_downloads(streamers, processes):
   """
@@ -24,7 +16,7 @@ def start_downloads(streamers, processes):
     # Create output folder
     output_folder = f'output/{streamer}/stream/'
     utils.mkdir(output_folder)
-    output_file_path = utils.opj(output_folder, streamer, f'-{utils.ts()}.mp4')
+    output_file_path = utils.opj(output_folder, f'{streamer}_{utils.ts()}.mp4')
     print(f'Starting download for {streamer}')
     # download and output to output/{streamer}/stream/{streamer.mp4}
     proc = subprocess.Popen(["yt-dlp", "--cookies", "cookies.txt", '-q', "--wait-for-video", "600", "-S", f'vcodec:h265,acodec:aac', "--no-part", f"https://www.twitch.tv/{streamer}", '-o', output_file_path ], preexec_fn=os.setsid)

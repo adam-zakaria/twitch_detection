@@ -311,8 +311,8 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
 
     # iterate through frames and perform template matching
     for i, (ts, frame) in enumerate(timestamps_and_frames):
-        # print the current frame
-        print(f"\rProcessing frame {i}", end="")
+        # print the current frame - This trick only works for an interactive terminal 
+        # print(f"\rProcessing frame {i}", end="")
         
         # initialize output image path
         OUTPUT_IMAGE_PATH  = f'{output_folder_path}/{ts}.png'
@@ -379,7 +379,7 @@ def extract(timestamps, video_path):
   for ts in timestamps:
     os.system(f"ffmpeg -i {video_path} -ss {ts} -t 3 -c copy {ts}.mp4")
 
-def concat(input_file_paths, output_file_path="output.mp4"):
+def concat(input_file_paths, output_file_path="output.mp4", log_file_path=''):
   if not input_file_paths:
     raise ValueError("No input files provided.")
 
@@ -407,15 +407,16 @@ def concat(input_file_paths, output_file_path="output.mp4"):
     output_file_path
   ])
 
-  # Print the command for debugging
-  print(" ".join(ffmpeg_cmd))
+  if log_file_path: 
+    # Print the command for debugging
+    utils.wa(" ".join(ffmpeg_cmd), log_file_path)
 
   # Execute the command
   subprocess.run(ffmpeg_cmd, check=True)
 
   return output_file_path
 
-def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=False, verbose = False, log_file=None):
+def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=False, verbose = False, log_file_path=None):
     """
     Extracts a clip from a video using ffmpeg with optional start and end times.
 
@@ -453,8 +454,8 @@ def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=Fa
         print(cmd)
     
     # Output to log if log
-    if log_file:
-        utils.wa(cmd, log_file)
+    if log_file_path:
+        utils.wa(cmd, log_file_path)
 
     # execute the command
     os.system(cmd)
