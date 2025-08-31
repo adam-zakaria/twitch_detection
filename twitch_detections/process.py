@@ -25,8 +25,8 @@ def hms(seconds):
 
     return " ".join(parts)
 
-def log(str, log_file_path = config.log_file_path):
-    utils.wa(str, log_file_path)
+def log(s, log_file_path = config.log_file_path):
+    utils.wa(f'{s}\n', log_file_path)
 
 def process_stream(stream_path=''):
     """
