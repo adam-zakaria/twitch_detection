@@ -1,0 +1,15 @@
+Template match found at 7.0 with confidence 0.8725
+Template match found at 8.0 with confidence 0.8731
+Template match found at 18.0 with confidence 0.8806
+Template match found at 19.0 with confidence 0.8750
+Template match found at 29.0 with confidence 0.8639
+Template match found at 30.0 with confidence 0.8849
+Template match found at 31.0 with confidence 0.8906
+Template match found at 40.0 with confidence 0.8977
+Template match found at 41.0 with confidence 0.9021
+Template match found at 51.0 with confidence 0.8618
+Template match found at 52.0 with confidence 0.8895
+Template match found at 62.0 with confidence 0.8641
+Template match found at 63.0 with confidence 0.8703
+Template match found at 64.0 with confidence 0.8591
+ffmpeg -y -loglevel error -ss -1.0 -i output/fluff0132/stream/fluff0132_08_30_2025_23_05_03.mp4 -to 11.0 -c copy output/fluff0132/clips/7.0.mp4ffmpeg -y -loglevel error -ss 10.0 -i output/fluff0132/stream/fluff0132_08_30_2025_23_05_03.mp4 -to 11.0 -c copy output/fluff0132/clips/18.0.mp4ffmpeg -y -loglevel error -ss 21.0 -i output/fluff0132/stream/fluff0132_08_30_2025_23_05_03.mp4 -to 11.0 -c copy output/fluff0132/clips/29.0.mp4ffmpeg -y -loglevel error -ss 32.0 -i output/fluff0132/stream/fluff0132_08_30_2025_23_05_03.mp4 -to 11.0 -c copy output/fluff0132/clips/40.0.mp4ffmpeg -y -loglevel error -ss 43.0 -i output/fluff0132/stream/fluff0132_08_30_2025_23_05_03.mp4 -to 11.0 -c copy output/fluff0132/clips/51.0.mp4ffmpeg -y -loglevel error -ss 54.0 -i output/fluff0132/stream/fluff0132_08_30_2025_23_05_03.mp4 -to 11.0 -c copy output/fluff0132/clips/62.0.mp4

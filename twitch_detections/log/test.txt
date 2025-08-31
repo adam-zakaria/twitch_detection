@@ -1,0 +1,13 @@
+The path does not exist: /home/ubuntu/.pm2/logs/twitch-out.log
+Starting downloads at 08_30_2025_23_53_45
+Going to run process in 2 minutes
+Starting download for fluff0132
+Starting download for luciid_tw
+Killing all downloads
+Starting process_streams() on ['output/fluff0132/stream/fluff0132_08_30_2025_23_53_45.mp4']
+Starting process() at 08_30_2025_23_55_45 on output/fluff0132/stream/fluff0132_08_30_2025_23_53_45.mp4
+The stream is 1 minutes 2 seconds
+Template matching each frame
+Removing output/fluff0132/stream/fluff0132_08_30_2025_23_53_45.mp4
+process() took 0 seconds
+[CLEANUP] Killing twitch.tv downloads...
