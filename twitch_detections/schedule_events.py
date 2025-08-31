@@ -18,13 +18,6 @@ import config
 import download
 from datetime import datetime, timedelta
 
-def hms(seconds):
-  # Convert seconds to HH:MM:SS format
-  hours = seconds // 3600
-  minutes = (seconds % 3600) // 60
-  seconds = seconds % 60
-  return f"{hours}:{minutes}:{seconds}"
-
 def cleanup_on_exit():
   print('[CLEANUP] Killing twitch.tv downloads...')
   subprocess.run("ps aux | grep '[t]witch.tv' | awk '{print $2}' | xargs kill -9", shell=True)

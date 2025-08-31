@@ -244,7 +244,7 @@ def benchmark_process(stream_path):
   try:
       start_time = time.time()
       timestamps_and_frames_generator = crop(
-          input_path=stream_path, x=710, y=479, w=200, h=200, every_nth_frame=60
+          input_path=stream_path, x=710, y=479, w=75, h=50, every_nth_frame=60
       )
       end_time = time.time()
       print(f'\tCrop took {hms(end_time - start_time)}')
