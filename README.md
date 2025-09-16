@@ -10,7 +10,7 @@ or
 `pip install -e .` (works from anywhere)
 
 # Run
-`poetry shell`
+`source /Users/azakaria/Library/Caches/pypoetry/virtualenvs/twitch-detections-UsLtH0Yo-py3.13/bin/activate`
 `pm2 start 'python -u schedule_events.py' --name 'twitch'`
 
 # Add packages to project

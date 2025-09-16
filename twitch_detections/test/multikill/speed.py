@@ -184,7 +184,7 @@ def crop(input_path='', x=0, y=0, w=0, h=0, every_nth_frame=None):
         yield(ts,crop)
         #timestamps_crops.append((ts, crop))
 
-def template_match_folder(timestamps_and_frames=[], output_folder_path='', template_image_path='', log_file_path='', threshold=.8, verbose=False):
+def template_match_folder(output_folder_path='', template_image_path='', log_file_path='', threshold=.8, verbose=False):
     """
     Template match each frame in the folder
     timestamps_and_frames: list of tuples (timestamp, frame)
@@ -216,7 +216,7 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
     log_str = ''
 
     # iterate through frames and perform template matching
-    for i, (ts, frame) in enumerate(timestamps_and_frames):
+    for i, (ts, frame) in enumerate(crop(input_path=stream_path, x=710, y=479, w=75, h=50, every_nth_frame=60)):
         # print the current frame - This trick only works for an interactive terminal 
         # print(f"\rProcessing frame {i}", end="")
         

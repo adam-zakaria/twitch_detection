@@ -8,13 +8,13 @@ streamers = [
     'pzzznguin', 'manny_hcs', 'druk84', 'lastshot', 'royal2', 'frosty', 'cykul', 'scoobmeister', 'stresss', 'slg_']
 """
 streamers = [
-    'fluff0132', 'luciid_tw'
+    'fluff0132', 'luciid_tw', 'hunter_jjx'
 ]
 
 # Time offsets (in minutes)
-kill_time = 1
-process_time = 2
-restart_download_time = 900
+kill_time = 660 # 11 hours (1PM - 12AM
+process_time = 662
+restart_download_time = 900 # Restart download is currently commented out
 
 log_dir = 'log'
 utils.mkdir(log_dir)

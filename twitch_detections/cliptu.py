@@ -448,7 +448,7 @@ def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=Fa
         cmd += f" -to {end_time - start_time}"
     
     # Complete the command with the copy and output options
-    cmd += f" -c copy {output_path}"
+    cmd += f" -c copy {output_path}\n"
     
     # Print the command and execute it
     if verbose:
