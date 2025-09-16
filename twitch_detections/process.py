@@ -25,7 +25,7 @@ def hms(seconds):
 
     return " ".join(parts)
 
-def process_stream(stream_path=''):
+def process_stream(stream_path = '', cleanup = False):
     """
     Given a path to a stream:
     * Template match to detect double kills
@@ -117,12 +117,13 @@ def process_stream(stream_path=''):
         print(f'Exception {e} in process')
 
     finally:
-        # Cleanup
-        print(f'Removing {stream_path}')
-        try:
-            utils.rm(stream_path)
-        except Exception as e:
-            print(f'Error removing processed streams: {e}')
+        if cleanup:
+            # Cleanup
+            print(f'Removing {stream_path}')
+            try:
+                utils.rm(stream_path)
+            except Exception as e:
+                print(f'Error removing processed streams: {e}')
         process_stream_end_time = time.time()
         print(f'process() took {hms(process_stream_end_time - process_stream_start_time)}')
         return

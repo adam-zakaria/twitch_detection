@@ -25,12 +25,13 @@ def hms(seconds):
   seconds = seconds % 60
   return f"{hours}:{minutes}:{seconds}"
 
-def cleanup_on_exit():
+def cleanup_on_exit(remove_streams = False):
   print('[CLEANUP] Killing twitch.tv downloads...')
   subprocess.run("ps aux | grep '[t]witch.tv' | awk '{print $2}' | xargs kill -9", shell=True)
   subprocess.run("ps aux | grep '[f]fmpeg' | awk '{print $2}' | xargs kill -9", shell=True)
-  for stream_path in glob.glob(f'output/**/stream/*.mp4'):
-      utils.rm(stream_path)
+  if remove_streams:
+    for stream_path in glob.glob(f'output/**/stream/*.mp4'):
+        utils.rm(stream_path)
 
 if __name__ == "__main__":
   """

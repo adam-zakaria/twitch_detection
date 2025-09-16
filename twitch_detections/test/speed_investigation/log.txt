@@ -1,0 +1,6 @@
+Template match found at 7.983333333333333 with confidence 0.8809
+Template match found at 8.983333333333333 with confidence 0.8960
+Template match found at 9.983333333333333 with confidence 0.8966
+Template match found at 7.983333333333333 with confidence 0.8809
+Template match found at 8.983333333333333 with confidence 0.8960
+Template match found at 9.983333333333333 with confidence 0.8966
