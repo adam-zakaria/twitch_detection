@@ -1,3 +1,11 @@
+"""
+match template with not just dk, tk, ok, etc.
+
+so:
+maybe - if dk, template match tk for next 5 seconds, if tk, then okay for the next x seconds
+So it's not tk every second
+"""
+
 import sys
 sys.path.append("/home/ubuntu/Code/twitch_detections/twitch_detections")
 import cv2
@@ -6,19 +14,25 @@ import cliptu
 import happy_utils as utils
 from pathlib import Path
 
-def hms(seconds, float=False):
+
+import sys
+sys.path.append("/home/ubuntu/Code/twitch_detections/twitch_detections")
+import cv2
+import time
+import cliptu
+import happy_utils as utils
+from pathlib import Path
+
+
+def hms(seconds):
     parts = []
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)
-
-    # seconds: int by default; 2-decimal float if float=True
-    sec_val = seconds % 60
-    secs = round(sec_val, 2) if float else int(sec_val)
+    secs = int(seconds % 60)
 
     if hours: parts.append(f"{hours} hours")
     if minutes: parts.append(f"{minutes} minutes")
-    if secs or not parts:
-        parts.append(f"{secs:.2f} seconds" if float else f"{secs} seconds")
+    if secs or not parts: parts.append(f"{secs} seconds")
 
     return " ".join(parts)
 
@@ -170,7 +184,7 @@ def crop(input_path='', x=0, y=0, w=0, h=0, every_nth_frame=None):
         yield(ts,crop)
         #timestamps_crops.append((ts, crop))
 
-def template_match_folder(timestamps_and_frames=[], output_folder_path='', template_image_path='', log_file_path='', threshold=.8, verbose=False):
+def template_match_folder(output_folder_path='', template_image_path='', log_file_path='', threshold=.8, verbose=False):
     """
     Template match each frame in the folder
     timestamps_and_frames: list of tuples (timestamp, frame)
@@ -202,16 +216,15 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
     log_str = ''
 
     # iterate through frames and perform template matching
-    for i, (ts, frame) in enumerate(timestamps_and_frames):
+    for i, (ts, frame) in enumerate(crop(input_path=stream_path, x=710, y=479, w=75, h=50, every_nth_frame=60)):
         # print the current frame - This trick only works for an interactive terminal 
         # print(f"\rProcessing frame {i}", end="")
         
         # initialize output image path
         OUTPUT_IMAGE_PATH  = f'{output_folder_path}/{ts}.png'
 
-        if i == 1:
-            print(f'{frame.shape[:2]=}')
-            print(f'{template_image.shape[:2]=}')
+        #print(f'{frame.shape[:2]=}')
+        #print(f'{template_image.shape[:2]=}')
         # Perform template matching
         result = cv2.matchTemplate(frame, template_image, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -230,41 +243,28 @@ def template_match_folder(timestamps_and_frames=[], output_folder_path='', templ
         cv2.rectangle(frame, top_left, bottom_right, (0, 255, 0), 2)
 
         # Save and display the result
-        """
         if max_val >= threshold:
-            print('threshold')
             log_strs += f"Template match found at {ts} with confidence {max_val:.4f}\n"
             cv2.imwrite(OUTPUT_IMAGE_PATH, frame)
             match_timestamps.append(ts)
-        """
 
     # write log and return match timestamps
     utils.wa(log_strs, log_path)
     return match_timestamps
 
 def benchmark_process(stream_path):
-  cv2.setUseOptimized(True)
-  try: cv2.setNumThreads(max(1, cv2.getNumberOfCPUs()-1))
-  except: pass
-
   template_path = '/home/ubuntu/Code/twitch_detections/twitch_detections/test/frame/double_kill_tighter.png'
 
   # Template match (and create frame generator)
   print(f'Running benchmark_process() on {stream_path}')
-  print(f'The stream is {hms(cliptu.get_video_length(stream_path), float = True)}')
+  print(f'The stream is {hms(cliptu.get_video_length(stream_path))}')
   try:
-      every_nth_frame = 60
-      print(f'Grabbing every {every_nth_frame} frame')
       start_time = time.time()
       timestamps_and_frames_generator = crop(
-<<<<<<< HEAD
-          input_path=stream_path, x=710, y=479, w=75, h=50, every_nth_frame=every_nth_frame
-=======
           input_path=stream_path, x=710, y=479, w=75, h=50, every_nth_frame=60
->>>>>>> a3ddacd1000699bab28e7cc9706922f0a5eecd05
       )
       end_time = time.time()
-      print(f'\tCrop took {hms(end_time - start_time, float = True)}')
+      print(f'\tCrop took {hms(end_time - start_time)}')
       start_time = time.time()
       match_timestamps = template_match_folder(
           timestamps_and_frames=timestamps_and_frames_generator,
@@ -274,7 +274,7 @@ def benchmark_process(stream_path):
           threshold=0.8
       )
       end_time = time.time()
-      print(f'\tTemplate match took {hms(end_time - start_time, float = True)}')
+      print(f'\tTemplate match took {hms(end_time - start_time)}')
       # Check for detections
       if match_timestamps == []:
         print('\tno matches found, exiting process()')
@@ -286,5 +286,5 @@ def benchmark_process(stream_path):
       return
 
 if __name__ == "__main__":
-  stream_path = '/home/ubuntu/Code/twitch_detections/twitch_detections/test/speed_investigation/bound_10s.mp4'
+  stream_path = '/home/ubuntu/Code/twitch_detections/twitch_detections/test/speed_investigation/output_trimmed.mp4'
   benchmark_process(stream_path)

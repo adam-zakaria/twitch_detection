@@ -18,6 +18,7 @@ import config
 import download
 from datetime import datetime, timedelta
 
+<<<<<<< HEAD
 def hms(seconds):
   # Convert seconds to HH:MM:SS format
   hours = seconds // 3600
@@ -26,6 +27,9 @@ def hms(seconds):
   return f"{hours}:{minutes}:{seconds}"
 
 def cleanup_on_exit(remove_streams = False):
+=======
+def cleanup_on_exit():
+>>>>>>> a3ddacd1000699bab28e7cc9706922f0a5eecd05
   print('[CLEANUP] Killing twitch.tv downloads...')
   subprocess.run("ps aux | grep '[t]witch.tv' | awk '{print $2}' | xargs kill -9", shell=True)
   subprocess.run("ps aux | grep '[f]fmpeg' | awk '{print $2}' | xargs kill -9", shell=True)

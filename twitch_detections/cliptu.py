@@ -85,67 +85,68 @@ def get_fps(video_path):
 def get_frames(video_path, timestamps=None, yield_timestamps=False, every_nth_frame=None):
     """
     Generator to yield frames from a video.
-    
-    Args:
-        video_path (str): Path to the video file.
-        timestamps (list of float, optional): Do not go over the whole video, just get the frames for the timestamps (in seconds).
-            If provided, yields a tuple (timestamp, numpy.ndarray) for each timestamp.
-            Otherwise, yields all frames sequentially.
-        yield_timestamps (bool, optional): If True and timestamps is None,
-            calculates and yields the timestamp (using FPS and frame index) along with the frame.
-    
+
+    - When `timestamps` is None:
+        * Uses cap.grab() to skip frames cheaply.
+        * Uses cap.retrieve() only for frames you keep (every Nth).
+        * If `yield_timestamps=True`, yields (ts, frame) where ts = frame_index / FPS.
+          (Note: this timestamp is derived from FPS, not container timecodes.)
+    - When `timestamps` is provided:
+        * Seeks and decodes those frames (random access path; grab/retrieve is not applicable).
+
     Yields:
-        If timestamps is provided or yield_timestamps is True:
-            (timestamp, numpy.ndarray) tuples.
-        Otherwise:
-            numpy.ndarray frames.
-
-    Example:
-        import cliptu.utils as cliptu
-
-        for ts,frame in cliptu.get_frames('/Users/azakaria/Code/twitch_detections/twitch_detections/videos/aqua_no_dks.mov', yield_timestamps=True):
-            print(ts)
+        If timestamps provided or yield_timestamps=True -> (timestamp, frame)
+        else -> frame
     """
-    # open video
     cap = cv2.VideoCapture(video_path)
-
-    # Check if the video was opened successfully
     if not cap.isOpened():
         raise ValueError(f"Error: Cannot open video at path '{video_path}'")
-    
-    # if no timestamps are provided, go through the whole video
-    if timestamps is None:
-        if yield_timestamps:
-            # yield timestamps and frames, below
-            fps = cap.get(cv2.CAP_PROP_FPS)
+
+    try:
+        if timestamps is None:
+            # sequential scan
+            step = max(1, int(every_nth_frame) if every_nth_frame else 1)
+            fps = cap.get(cv2.CAP_PROP_FPS) if yield_timestamps else None
+
             frame_index = 0
             while True:
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                if every_nth_frame and frame_index % every_nth_frame == 0:
-                    timestamp = frame_index / fps  # Calculate timestamp from frame index and fps
-                    # yield timestamps and frames
-                    yield timestamp, frame
+                # Skip step-1 frames with grab() (no full decode)
+                for _ in range(step - 1):
+                    ok = cap.grab()
+                    if not ok:
+                        return  # end of stream
+                    frame_index += 1
+
+                # Grab the kept frame and then retrieve (decode once)
+                ok = cap.grab()
+                if not ok:
+                    return
+                ok, frame = cap.retrieve()
+                if not ok:
+                    return
+
+                if yield_timestamps:
+                    if fps is None or fps <= 0:
+                        fps = cap.get(cv2.CAP_PROP_FPS) or 0.0
+                    ts = (frame_index) / fps if fps > 0 else 0.0
+                    yield ts, frame
+                else:
+                    yield frame
+
                 frame_index += 1
+
         else:
-            # do not yield timestamps (simpler interface)
-            while True:
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                yield frame
-    # if timestamps are provided, go through the provided timestamps, and yield the frames at the provided timestamps and frames
-    else:
-        for t in sorted(timestamps):
-            cap.set(cv2.CAP_PROP_POS_MSEC, t * 1000)
-            ret, frame = cap.read()
-            if ret:
-                yield t, frame
-            else:
-                print(f"Warning: Could not retrieve frame at {t} seconds.")
-    
-    cap.release()
+            # random access by timestamps (seek -> decode)
+            for t in sorted(timestamps):
+                # Set position by milliseconds; decoder may need to decode from prior keyframe.
+                cap.set(cv2.CAP_PROP_POS_MSEC, float(t) * 1000.0)
+                ok, frame = cap.read()
+                if ok:
+                    yield t, frame if yield_timestamps else (t, frame)  # keep (t, frame) API
+                else:
+                    print(f"Warning: Could not retrieve frame at {t} seconds.")
+    finally:
+        cap.release()
 
 def ffprobe(video_file, output_file=""):
   ffprobe_command = [
@@ -447,7 +448,7 @@ def extract_clip(input_path, output_path, start_time=None, end_time=None, gpu=Fa
         cmd += f" -to {end_time - start_time}"
     
     # Complete the command with the copy and output options
-    cmd += f" -c copy {output_path}"
+    cmd += f" -c copy {output_path}\n"
     
     # Print the command and execute it
     if verbose:
