@@ -18,7 +18,6 @@ import config
 import download
 from datetime import datetime, timedelta
 
-<<<<<<< HEAD
 def hms(seconds):
   # Convert seconds to HH:MM:SS format
   hours = seconds // 3600
@@ -27,9 +26,6 @@ def hms(seconds):
   return f"{hours}:{minutes}:{seconds}"
 
 def cleanup_on_exit(remove_streams = False):
-=======
-def cleanup_on_exit():
->>>>>>> a3ddacd1000699bab28e7cc9706922f0a5eecd05
   print('[CLEANUP] Killing twitch.tv downloads...')
   subprocess.run("ps aux | grep '[t]witch.tv' | awk '{print $2}' | xargs kill -9", shell=True)
   subprocess.run("ps aux | grep '[f]fmpeg' | awk '{print $2}' | xargs kill -9", shell=True)
@@ -50,17 +46,14 @@ if __name__ == "__main__":
   # Init config data
   streamers = config.streamers
   now = datetime.now()
-  kill_time = (now + timedelta(minutes=config.kill_time)).strftime("%H:%M:%S")
-  process_time = (now + timedelta(minutes=config.process_time)).strftime("%H:%M:%S")
-  restart_download_time = (now + timedelta(minutes=config.restart_download_time)).strftime("%H:%M:%S")
+  kill_time = (now + timedelta(minutes=config.kill_time)).strftime("%H:%M")
+  process_time = (now + timedelta(minutes=config.process_time)).strftime("%H:%M")
+  restart_download_time = (now + timedelta(minutes=config.restart_download_time)).strftime("%H:%M")
 
   # Register cleanup on normal exit, and catch signals like Ctrl+C and kill
   atexit.register(cleanup_on_exit)
   signal.signal(signal.SIGINT, lambda s, f: sys.exit(1))   # Ctrl+C
   signal.signal(signal.SIGTERM, lambda s, f: sys.exit(1))  # kill or shutdown
-
-  # Clear log files
-  utils.rm('/home/ubuntu/.pm2/logs/twitch-out.log')
 
   # Start downloads now
   processes = []
@@ -84,7 +77,19 @@ if __name__ == "__main__":
   #   streamers,
   #   processes
   # )
+
+  last_debug = time.time()
   # Infinite loop so schedule can fire events 
   while True:
     schedule.run_pending()
     time.sleep(1)
+
+    # Print debug info every 600 seconds (10 minutes)
+    #if time.time() - last_debug >= 600:
+    if time.time() - last_debug >= 10:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M")
+        print(f"\n[DEBUG] now={now}")
+        for j in schedule.get_jobs():
+            print(f"[job] {j.job_func.__name__} next_run={j.next_run}")
+        print("-" * 40)
+        last_debug = time.time()
