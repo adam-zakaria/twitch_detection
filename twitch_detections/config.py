@@ -1,7 +1,6 @@
 import happy_utils as utils
 # Streamers to track
 
-"""
 streamers = [
     'minib3rzerker', 'hunter_jjx', 'trunks', 'wryce', 'snakebite','bound', 'lqgendd', 'formal', 'barcode_ak', 'Luciid_tw',
     'spartanthedogg', 'Tripppey', 'envor3', 'wutum',
@@ -10,9 +9,10 @@ streamers = [
 streamers = [
     'fluff0132', 'luciid_tw', 'hunter_jjx'
 ]
+"""
 
 # Time offsets (in minutes)
-kill_time = 660 # 11 hours (1PM - 12AM
+kill_time = 660 # 11 hours (130PM - 1230AM)
 process_time = 662
 restart_download_time = 900 # Restart download is currently commented out
 

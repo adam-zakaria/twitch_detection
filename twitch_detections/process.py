@@ -28,7 +28,7 @@ def hms(seconds):
 def log(s, log_file_path = config.log_file_path):
     utils.wa(f'{s}\n', log_file_path)
 
-def process_stream(stream_path=''):
+def process_stream(stream_path='', cleanup = False):
     """
     Given a path to a stream:
     * Template match to detect double kills
@@ -121,14 +121,15 @@ def process_stream(stream_path=''):
 
     finally:
         # Cleanup
-        log(f'Removing {stream_path}')
-        try:
-            utils.rm(stream_path)
-        except Exception as e:
-            log(f'Error removing processed streams: {e}')
-        process_stream_end_time = time.time()
-        log(f'process() took {hms(process_stream_end_time - process_stream_start_time)}')
-        return
+        if cleanup:
+            log(f'Removing {stream_path}')
+            try:
+                utils.rm(stream_path)
+            except Exception as e:
+                log(f'Error removing processed streams: {e}')
+            process_stream_end_time = time.time()
+            log(f'process() took {hms(process_stream_end_time - process_stream_start_time)}')
+            return
 
 def process_streams():
   # start processing once the streams are killed
